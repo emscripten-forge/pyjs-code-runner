@@ -1,15 +1,11 @@
 # pyjs-code-runner
 
-Write cross platform build scripts with the power of Python!
-To be used in the `boa` project.
+A driver to run python code in a wasm environment, almost like running vanilla python code.
 
-Currently supports `CMake`, `Autotools`, `Meson` and `Make`.
 
 ## Examples
 
-More coming soon!
 
-### CMake
 
 ```bash
 # run in node backend
@@ -36,5 +32,19 @@ pyjs_code_runner run script \
     --async-main           \
     --headless 
 
+```
+
+
+```bash
+# run in browser-worker-thread backend 
+# in a headless fashion
+pyjs_code_runner run script \
+    browser-worker                     \
+    --conda-env     /home/web_user/env \
+    --mount         ~/src/pyjs/tests:/tests \
+    --script        main.py \
+    --work-dir      /tests \
+    --async-main           \
+    --headless          
 
 ```
