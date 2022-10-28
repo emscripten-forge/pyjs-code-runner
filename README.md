@@ -11,8 +11,8 @@ Here we assume a file `main.py` located at `~/foo/bar/main.py`.
 
 ```bash
 # run with node
-pyjs_code_runner run script \
-    node \
+pyjs_code_runner run script                                                                \
+    node                                                                                   \
     --conda-env     ~/micromamba/envs/my_env         `# the emscripten-forge env`          \
                                                      `# in which to run the code`          \
                                                                                            \
