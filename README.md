@@ -7,16 +7,16 @@ A driver to run python code in a wasm environment, almost like running vanilla p
 
 
 
+Here we assume a file `main.py` located at `~/foo/bar/main.py`.
 
 ```bash
-# run in node backend
 pyjs_code_runner run script \
     node \
-    --conda-env     /home/web_user/env           `# the emscripten-forge env in which to run the code` \
-    --mount         ~/src/pyjs/tests:/tests      `# Mount path to virtual filesytem <HOST_MACHINE_PATH>:<TARGET_PATH>` \
-    --script        main.py                      `# Path of the script to run (in virtual filesystem)` \
-    --work-dir      /tests                       `# Work directory in the virtual fileystem` \
-    --async-main                                 `# should a top-level async main function be called`
+    --conda-env     ~/micromamba/envs/my_env         `# the emscripten-forge env in which to run the code` \
+    --mount         ~/foo/bar:/home/web_user/fubar   `# Mount path to virtual filesytem <HOST_MACHINE_PATH>:<TARGET_PATH>` \
+    --script        main.py                          `# Path of the script to run (in virtual filesystem)` \
+    --work-dir      /home/web_user/fubar             `# Work directory in the virtual fileystem` \
+    --async-main                                     `# should a top-level async main function be called`
 
 ```
 
@@ -26,8 +26,8 @@ pyjs_code_runner run script \
 # in a headless fashion
 pyjs_code_runner run script \
     browser-main \
-    --conda-env     /home/web_user/env \
-    --mount         ~/src/pyjs/tests:/tests \
+    --conda-env     ~/micromamba/envs/my_env \
+    --mount         ~/foo/bar:/home/web_user/fubar \
     --script        main.py \
     --work-dir      /tests \
     --async-main           \
@@ -40,9 +40,9 @@ pyjs_code_runner run script \
 # run in browser-worker-thread backend 
 # in a headless fashion
 pyjs_code_runner run script \
-    browser-worker                     \
-    --conda-env     /home/web_user/env \
-    --mount         ~/src/pyjs/tests:/tests \
+    browser-worker \
+    --conda-env     ~/micromamba/envs/my_env \
+    --mount         ~/foo/bar:/home/web_user/fubar \
     --script        main.py \
     --work-dir      /tests \
     --async-main           \
