@@ -87,7 +87,7 @@ jobs:
         run: |
           micromamba activate dev-env
           emsdk install ${{matrix.emsdk_ver}}
-
+    
           python -m pip install . 
         
       - name: Run Tests 
