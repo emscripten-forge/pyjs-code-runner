@@ -9,4 +9,4 @@ dependencies:
   - appdirs
   - empack >=2.0.0
   - microsoft::playwright
-
+  - emsdk
