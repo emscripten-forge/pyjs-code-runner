@@ -3,23 +3,55 @@ from pathlib import Path
 import os
 import shutil
 import sys
-
+import shutil
 from ..backend_base import BackendBase
 from subprocess import Popen, PIPE, STDOUT
+import textwrap
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 class NodeBackend(BackendBase):
-    def __init__(self, host_work_dir, work_dir, script, async_main, node_exe):
+    def __init__(self, host_work_dir, work_dir, script, async_main, node_binary):
         super().__init__(
             host_work_dir=host_work_dir,
             work_dir=work_dir,
             script=script,
             async_main=async_main,
         )
+        if node_binary is None:
+            shutil_node_binary = shutil.which("node")
+            if shutil_node_binary is None:
+                raise RuntimeError(
+                    textwrap.dedent(
+                        """\n
+                    pyjs-code-runner error: 
 
-        self.node_exe = node_exe
+                        * Cannot find node
+
+
+                    to use the node backend `node`/`nodejs` needs to be installed.
+
+                    Install playwight with:
+
+                        * conda:
+
+                            conda install -c conda-forge nodejs
+
+                        * mamba:
+
+                            mamba install -c conda-forge nodejs
+
+                        * micromamba:
+
+                            micromamb install -c conda-forge nodejs
+
+                """
+                    )
+                )
+            else:
+                node_binary = shutil_node_binary
+        self.node_binary = node_binary
 
     def run(self):
         main_name = "node_main.js"
@@ -27,7 +59,7 @@ class NodeBackend(BackendBase):
         shutil.copyfile(main, self.host_work_dir / main_name)
 
         cmd = [
-            "node",
+            self.node_binary,
             "--no-experimental-fetch",
             main_name,
             self.work_dir,
@@ -35,26 +67,16 @@ class NodeBackend(BackendBase):
             str(int(self.async_main)),
         ]
 
-        if False:
-            ret = subprocess.run(cmd, cwd=os.getcwd(), stdout=PIPE)
-            returncode = ret.returncode
-            output = ret.stdout.decode()
-            print(output)
-            if returncode != 0:
-                sys.exit(returncode)
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 
-        else:
-            print("START")
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-
-            # Poll process.stdout to show stdout live
-            while True:
-                output = process.stdout.readline()
-                if process.poll() is not None:
-                    break
-                if output:
-                    print(output.decode().strip())
-            rc = process.poll()
-            # print("RC", rc)
-            if process.returncode != 0:
-                sys.exit(process.returncode)
+        # Poll process.stdout to show stdout live
+        while True:
+            output = process.stdout.readline()
+            if process.poll() is not None:
+                break
+            if output:
+                print(output.decode().strip())
+        rc = process.poll()
+        # print("RC", rc)
+        if process.returncode != 0:
+            sys.exit(process.returncode)

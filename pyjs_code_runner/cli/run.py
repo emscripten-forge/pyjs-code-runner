@@ -173,9 +173,9 @@ def browser_worker(
     )
 
 
-node_exe_option = typer.Option(
+node_binary_option = typer.Option(
     None,
-    *make_names("env-cache-dir"),
+    "--node-binary",
     help="""node exectutable""",
 )
 
@@ -191,7 +191,7 @@ def node(
     pyjs_dir: Optional[Path] = pyjs_dir_option,
     host_work_dir: Optional[Path] = host_work_dir_option,
     cache_dir: Optional[Path] = cache_dir_option,
-    node_exe: Optional[Path] = node_exe_option,
+    node_binary: Optional[Path] = node_binary_option,
 ):
     run_script(
         backend_type=BackendType.node,
@@ -204,7 +204,7 @@ def node(
         pyjs_dir=pyjs_dir,
         cache_dir=cache_dir,
         host_work_dir=host_work_dir,
-        backend_kwargs=dict(node_exe=node_exe),
+        backend_kwargs=dict(node_binary=node_binary),
     )
 
 

@@ -25,12 +25,11 @@ def ensure_playwright_imports():
         import playwright
     except ModuleNotFoundError as e:
         msg = """\n
-            pyks-code-runner error: 
+            pyjs-code-runner error: 
 
                 * Cannot import playwright!
 
-            to use the browser-{worker/main} backends
-            playwright needs to be installed.
+            To use the browser-{worker/main} backends `playwright` needs to be installed.
 
             Install playwight with:
 
