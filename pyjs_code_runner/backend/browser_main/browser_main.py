@@ -28,14 +28,6 @@ class BrowserMainBackend(BackendBase):
         self.slow_mo = slow_mo
 
     def run(self):
-        print(
-            "run in browser-main",
-            self.script,
-            "port",
-            self.port,
-            "headless",
-            self.headless,
-        )
 
         browser_main_html = "browser_main.html"
         main = HTML_DIR / browser_main_html

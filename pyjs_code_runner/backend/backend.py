@@ -1,8 +1,5 @@
 from enum import Enum
-
-from .node.node import NodeBackend
-from .browser_main.browser_main import BrowserMainBackend
-from .browser_worker.browser_worker import BrowserWorkerBackend
+import textwrap
 
 
 class BackendFamilyType(str, Enum):
@@ -23,10 +20,53 @@ def get_backend_type_family(backend):
         return BackendFamilyType.browser
 
 
+def ensure_playwright_imports():
+    try:
+        import playwright
+    except ModuleNotFoundError as e:
+        msg = """\n
+            pyks-code-runner error: 
+
+                * Cannot import playwright!
+
+            to use the browser-{worker/main} backends
+            playwright needs to be installed.
+
+            Install playwight with:
+
+                * conda:
+
+                    conda install -c microsoft playwright
+
+                * mamba:
+
+                    mamba install -c microsoft playwright
+
+                * micromamba:
+
+                    micromamb install -c microsoft playwright
+
+                * pip:
+
+                    python -m pip install playwright
+
+        """
+        raise ModuleNotFoundError(textwrap.dedent(msg))
+
+
 def get_backend_cls(backend_type):
     if backend_type == BackendType.node:
+        from .node.node import NodeBackend
+
         return NodeBackend
+
     elif backend_type == BackendType.browser_main:
+        ensure_playwright_imports()
+        from .browser_main.browser_main import BrowserMainBackend
+
         return BrowserMainBackend
     elif backend_type == BackendType.browser_worker:
+        ensure_playwright_imports()
+        from .browser_worker.browser_worker import BrowserWorkerBackend
+
         return BrowserWorkerBackend

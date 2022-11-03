@@ -1,4 +1,3 @@
-console.log("THE UTILS")
 async function make_pyjs(print, error) {
     var pyjs = await createModule({print:print,error:print})
     var EmscriptenForgeModule = pyjs

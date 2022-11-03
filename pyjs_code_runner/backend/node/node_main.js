@@ -27,7 +27,7 @@ async_main = parseInt(process.argv[4]);
         }
         catch(e){
             console.error("error while evaluating main file:",e)
-            return 1;
+            process.exit(1);
         }
         if(async_main)
         {
