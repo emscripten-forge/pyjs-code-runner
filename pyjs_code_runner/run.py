@@ -1,4 +1,3 @@
-from rich.pretty import pprint
 from .backend.backend import BackendType, get_backend_type_family, get_backend_cls
 from .constants import EXPORT_NAME_SUFFIX
 from .js_global_object import js_global_object

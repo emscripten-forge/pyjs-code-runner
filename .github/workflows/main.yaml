@@ -57,7 +57,7 @@ jobs:
           emsdk activate ${{matrix.emsdk_ver}}
           source $CONDA_EMSDK_DIR/emsdk_env.sh
 
-          pytest
+          pytest -s
 
 
   test_with_pip:
@@ -87,7 +87,7 @@ jobs:
         run: |
           micromamba activate dev-env
           emsdk install ${{matrix.emsdk_ver}}
-    
+
           python -m pip install . 
         
       - name: Run Tests 
@@ -96,6 +96,6 @@ jobs:
           emsdk activate ${{matrix.emsdk_ver}}
           source $CONDA_EMSDK_DIR/emsdk_env.sh
 
-          pytest
+          pytest -s
 
  
