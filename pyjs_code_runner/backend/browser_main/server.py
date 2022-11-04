@@ -30,6 +30,8 @@ def start_server(work_dir, port):
 @contextmanager
 def server_context(work_dir, port):
     thread, server = start_server(work_dir=work_dir, port=port)
-    yield server, f"http://127.0.0.1:{port}"
-    server.shutdown()
-    thread.join()
+    try:
+        yield server, f"http://127.0.0.1:{port}"
+    finally:
+        server.shutdown()
+        thread.join()

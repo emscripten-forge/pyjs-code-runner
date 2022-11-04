@@ -2,7 +2,7 @@ import os
 import asyncio
 from ..backend_base import BackendBase
 from ...constants import JS_DIR, HTML_DIR
-from .server import server_context, find_free_port
+from ..browser_main.server import server_context, find_free_port
 from playwright.async_api import async_playwright
 from pathlib import Path
 import shutil
@@ -43,6 +43,8 @@ class BrowserWorkerBackend(BackendBase):
 
             page_url = f"{url}/{browser_worker_html}"
             ret = asyncio.run(self.playwright_run_in_worker_thread(page_url=page_url))
+            if ret != 0:
+                raise RuntimeError("return_code != 0")
 
     async def playwright_run_in_worker_thread(self, page_url):
         async with async_playwright() as p:

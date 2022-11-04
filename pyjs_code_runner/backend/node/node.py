@@ -2,6 +2,7 @@ import subprocess
 from pathlib import Path
 import os
 import shutil
+import json
 import sys
 import shutil
 from ..backend_base import BackendBase
@@ -54,6 +55,7 @@ class NodeBackend(BackendBase):
         self.node_binary = node_binary
 
     def run(self):
+        print("RUN IN NODE")
         main_name = "node_main.js"
         main = Path(THIS_DIR) / main_name
         shutil.copyfile(main, self.host_work_dir / main_name)
@@ -65,10 +67,9 @@ class NodeBackend(BackendBase):
             self.work_dir,
             self.script,
             str(int(self.async_main)),
+            self.host_work_dir,
         ]
-
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-
         # Poll process.stdout to show stdout live
         while True:
             output = process.stdout.readline()
@@ -77,6 +78,14 @@ class NodeBackend(BackendBase):
             if output:
                 print(output.decode().strip())
         rc = process.poll()
-        # print("RC", rc)
         if process.returncode != 0:
-            sys.exit(process.returncode)
+            raise RuntimeError(f"node return with returncode: {process.returncode}")
+
+        result_path = self.host_work_dir / "_node_result.json"
+        if result_path.exists():
+            with open(result_path, "r") as f:
+                results = json.load(f)
+            if results["return_code"] != 0:
+                raise RuntimeError(results["error"])
+        else:
+            raise RuntimeError("internal error in pyjs-code-runner")
