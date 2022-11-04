@@ -20,6 +20,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
     ],
+    include_package_data=True,
     description="pyjs_code_runner emscripten+boa",
     entry_points={
         "console_scripts": [
