@@ -47,8 +47,6 @@ jobs:
       - name: Install pyjs-code-runner
         run: |
           micromamba activate dev-env
-          emsdk install ${{matrix.emsdk_ver}}
-
           python -m pip install . --no-deps
         
       - name: Run Tests 
