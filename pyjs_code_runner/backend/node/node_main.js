@@ -13,7 +13,7 @@ node_result_json = path.join(host_work_dir, '_node_result.json');
 
 function report_error(e){
     let data = JSON.stringify({
-        err: e,
+        error: e,
         return_code: 1
     });
     fs.writeFileSync(node_result_json, data);
@@ -21,7 +21,7 @@ function report_error(e){
 
 function report_no_run(){
     let data = JSON.stringify({
-        err: "unknown error, code did not run properly",
+        error: "unknown error, code did not run properly",
         return_code: 1
     });
     fs.writeFileSync(node_result_json, data);
