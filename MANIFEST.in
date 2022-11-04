@@ -1,3 +1,5 @@
-include requirements.txt
-recursive-include *.js
-recursive-include *.html
+include pyjs_code_runner/html/browser_main.html
+include pyjs_code_runner/html/browser_worker.html
+include pyjs_code_runner/js/utils.js
+include pyjs_code_runner/js/worker.js
+include pyjs_code_runner/backend/node/node_main.js
