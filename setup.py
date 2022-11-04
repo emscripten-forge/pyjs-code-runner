@@ -34,6 +34,6 @@ setup(
     name="pyjs_code_runner",
     packages=find_packages(),
     url="https://github.com/emscripten-forge/pyjs_code_runner",
-    version="0.1.0",
+    version="1.0.0",
     zip_safe=False,
 )
