@@ -1,4 +1,5 @@
 # pyjs-code-runner
+[![CI](https://github.com/emscripten-forge/pyjs-code-runner/actions/workflows/main.yaml/badge.svg)](https://github.com/emscripten-forge/pyjs-code-runner/actions/workflows/main.yaml)
 
 A driver to run python code in a wasm environment, almost like running vanilla python code.
 
