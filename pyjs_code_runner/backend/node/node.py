@@ -78,8 +78,10 @@ class NodeBackend(BackendBase):
             if output:
                 print(output.decode().strip())
         rc = process.poll()
-        if process.returncode != 0:
-            raise RuntimeError(f"node return with returncode: {process.returncode}")
+        # if process.returncode != 0:
+        #     raise RuntimeError(
+        #         f"node return with returncode: {process.returncode} rc {rc}"
+        #     )
 
         result_path = self.host_work_dir / "_node_result.json"
         if result_path.exists():
