@@ -115,7 +115,7 @@ class TestCli(object):
         ] + backend_args
         # fmt: on
 
-        result = runner.invoke(app, cli_args)
+        result = runner.invoke(app, cli_args, catch_exceptions=False)
         assert result.exit_code == 0
         assert "hello world" in result.stdout
 
@@ -163,6 +163,6 @@ class TestCli(object):
         ] + backend_args
         # fmt: on
 
-        result = runner.invoke(app, cli_args)
+        result = runner.invoke(app, cli_args, catch_exceptions=False)
         assert result.exit_code == 0
         assert "hello world" in result.stdout
