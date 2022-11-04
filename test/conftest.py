@@ -4,6 +4,7 @@ from pathlib import Path
 import appdirs
 import shutil
 from typer.testing import CliRunner
+import os
 
 # @pytest.fixture(scope="session")
 # def session_temp_path(tmp_path_factory):
