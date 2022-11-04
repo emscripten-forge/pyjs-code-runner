@@ -40,6 +40,8 @@ class BrowserMainBackend(BackendBase):
 
             page_url = f"{url}/{browser_main_html}"
             ret = asyncio.run(self.playwright_run_in_main_thread(page_url=page_url))
+            if ret != 0:
+                raise RuntimeError("return_code != 0")
 
     async def playwright_run_in_main_thread(self, page_url):
         async with async_playwright() as p:

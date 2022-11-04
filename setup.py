@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-requirements = ["typer", "playwright", "appdirs"]
+requirements = ["typer", "playwright", "appdirs", "empack >=2.0.0", "rich"]
 
 setup(
     author="Thorsten Beier",
@@ -20,6 +20,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
     ],
+    include_package_data=True,
     description="pyjs_code_runner emscripten+boa",
     entry_points={
         "console_scripts": [
@@ -29,7 +30,6 @@ setup(
     install_requires=requirements,
     long_description=readme,
     long_description_content_type="text/markdown",
-    include_package_data=True,
     keywords="pyjs_code_runner",
     name="pyjs_code_runner",
     packages=find_packages(),

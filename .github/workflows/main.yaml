@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+
+defaults:
+  run:
+    shell: bash -l {0}
+
+
+jobs:
+
+  test_with_conda:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        emsdk_ver: ["3.1.2"]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get number of CPU cores
+        uses: SimenB/github-actions-cpu-cores@v1
+
+      - name: Install mamba
+        uses: mamba-org/provision-with-micromamba@main
+        with:
+          environment-file: dev-env.yml
+          environment-name: dev-env
+          micromamba-version: "0.22.0"
+
+      - name: Install Playwright
+        run: |
+          playwright install
+
+      - name: Setup emsdk
+        run: |
+          micromamba activate dev-env
+          emsdk install ${{matrix.emsdk_ver}}
+
+      - name: Install pyjs-code-runner
+        run: |
+          micromamba activate dev-env
+          python -m pip install . --no-deps
+        
+      - name: Run Tests 
+        run: |
+          micromamba activate dev-env
+          emsdk activate ${{matrix.emsdk_ver}}
+          source $CONDA_EMSDK_DIR/emsdk_env.sh
+
+          pytest -s
+
+
+  test_with_pip:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        emsdk_ver: ["3.1.2"]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get number of CPU cores
+        uses: SimenB/github-actions-cpu-cores@v1
+
+      - name: Install mamba
+        uses: mamba-org/provision-with-micromamba@main
+        with:
+          environment-file: dev-env-pip.yml
+          environment-name: dev-env
+          micromamba-version: "0.22.0"
+
+      
+      - name: Install pyjs-code-runner
+        run: |
+          micromamba activate dev-env
+          emsdk install ${{matrix.emsdk_ver}}
+
+          python -m pip install . 
+          playwright install
+        
+      - name: Run Tests 
+        run: |
+          micromamba activate dev-env
+          emsdk activate ${{matrix.emsdk_ver}}
+          source $CONDA_EMSDK_DIR/emsdk_env.sh
+
+          pytest -s
+
+ 

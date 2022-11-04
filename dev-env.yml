@@ -1,0 +1,13 @@
+name: ci-env
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - pip
+  - pytest
+  - typer
+  - appdirs
+  - empack >=2.0.0
+  - microsoft::playwright
+  - emsdk
+  - rich

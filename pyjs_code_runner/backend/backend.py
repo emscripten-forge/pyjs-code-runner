@@ -36,18 +36,24 @@ def ensure_playwright_imports():
                 * conda:
 
                     conda install -c microsoft playwright
+                    playwright install
 
                 * mamba:
 
                     mamba install -c microsoft playwright
+                    playwright install
 
                 * micromamba:
 
                     micromamb install -c microsoft playwright
+                    playwright install
 
                 * pip:
 
                     python -m pip install playwright
+                    playwright install
+
+
 
         """
         raise ModuleNotFoundError(textwrap.dedent(msg))

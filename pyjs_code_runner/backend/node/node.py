@@ -2,6 +2,7 @@ import subprocess
 from pathlib import Path
 import os
 import shutil
+import json
 import sys
 import shutil
 from ..backend_base import BackendBase
@@ -53,22 +54,33 @@ class NodeBackend(BackendBase):
                 node_binary = shutil_node_binary
         self.node_binary = node_binary
 
+    def supports_flag_no_experimental_fetch(self):
+        probe_cmd = [self.node_binary, "--no-experimental-fetch", "--version"]
+        ret_code = subprocess.call(
+            probe_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+        return ret_code == 0
+
     def run(self):
         main_name = "node_main.js"
         main = Path(THIS_DIR) / main_name
         shutil.copyfile(main, self.host_work_dir / main_name)
 
-        cmd = [
-            self.node_binary,
-            "--no-experimental-fetch",
-            main_name,
-            self.work_dir,
-            self.script,
-            str(int(self.async_main)),
-        ]
+        cmd = [self.node_binary]
+        if self.supports_flag_no_experimental_fetch():
+            cmd.append("--no-experimental-fetch")
+
+        cmd.extend(
+            [
+                main_name,
+                self.work_dir,
+                self.script,
+                str(int(self.async_main)),
+                self.host_work_dir,
+            ]
+        )
 
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-
         # Poll process.stdout to show stdout live
         while True:
             output = process.stdout.readline()
@@ -77,6 +89,16 @@ class NodeBackend(BackendBase):
             if output:
                 print(output.decode().strip())
         rc = process.poll()
-        # print("RC", rc)
         if process.returncode != 0:
-            sys.exit(process.returncode)
+            raise RuntimeError(
+                f"node return with returncode: {process.returncode} rc {rc}"
+            )
+
+        result_path = self.host_work_dir / "_node_result.json"
+        if result_path.exists():
+            with open(result_path, "r") as f:
+                results = json.load(f)
+            if results["return_code"] != 0:
+                raise RuntimeError(results["error"])
+        else:
+            raise RuntimeError("internal error in pyjs-code-runner")

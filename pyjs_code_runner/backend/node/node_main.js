@@ -1,7 +1,40 @@
+
+const fs = require('fs');
+var path = require('path');
+
+console.log(process.argv);
 work_dir = process.argv[2];
 script_path = process.argv[3];
 async_main = parseInt(process.argv[4]);
+host_work_dir =process.argv[5];
 
+node_result_json = path.join(host_work_dir, '_node_result.json');
+
+
+function report_error(e){
+    let data = JSON.stringify({
+        error: e,
+        return_code: 1
+    });
+    fs.writeFileSync(node_result_json, data);
+}
+
+function report_no_run(){
+    let data = JSON.stringify({
+        error: "unknown error, code did not run properly",
+        return_code: 1
+    });
+    fs.writeFileSync(node_result_json, data);
+}
+
+function report_success(e){
+    let data = JSON.stringify({
+        return_code: 0
+    });
+    fs.writeFileSync(node_result_json, data);
+}
+// a proper run will overwrite this
+report_no_run();
 (async () => {
     try {   
         const { default: createModule }  = await import("./pyjs_runtime_node.js")
@@ -27,7 +60,8 @@ async_main = parseInt(process.argv[4]);
         }
         catch(e){
             console.error("error while evaluating main file:",e)
-            process.exit(1);
+            report_error(e);
+            return;
         }
         if(async_main)
         {
@@ -61,10 +95,15 @@ asyncio.ensure_future(main_runner())
             let ret_code = pyjs.eval("_ret_code[0]");
             if(ret_code != 0)
             {   
-                process.exit(ret_code);
+                // process.exit(ret_code);
+                report_error(Error("python_return_code!= 0"));
+                return;
             }
         }
     } catch (e) {
        console.error(e)
+       report_error(e);
+       return;
     }
+    report_success()
 })();
