@@ -66,7 +66,7 @@ class NodeBackend(BackendBase):
         main = Path(THIS_DIR) / main_name
         shutil.copyfile(main, self.host_work_dir / main_name)
 
-    cmd = [self.node_binary]
+        cmd = [self.node_binary]
         if self.supports_flag_no_experimental_fetch():
             cmd.append("--no-experimental-fetch")
 
