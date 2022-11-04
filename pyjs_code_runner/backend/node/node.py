@@ -54,21 +54,32 @@ class NodeBackend(BackendBase):
                 node_binary = shutil_node_binary
         self.node_binary = node_binary
 
+    def supports_flag_no_experimental_fetch(self):
+        probe_cmd = [self.node_binary, "--no-experimental-fetch", "--version"]
+        ret_code = subprocess.call(
+            probe_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+        return ret_code == 0
+
     def run(self):
-        print("RUN IN NODE")
         main_name = "node_main.js"
         main = Path(THIS_DIR) / main_name
         shutil.copyfile(main, self.host_work_dir / main_name)
 
-        cmd = [
-            self.node_binary,
-            "--no-experimental-fetch",
-            main_name,
-            self.work_dir,
-            self.script,
-            str(int(self.async_main)),
-            self.host_work_dir,
-        ]
+    cmd = [self.node_binary]
+        if self.supports_flag_no_experimental_fetch():
+            cmd.append("--no-experimental-fetch")
+
+        cmd.extend(
+            [
+                main_name,
+                self.work_dir,
+                self.script,
+                str(int(self.async_main)),
+                self.host_work_dir,
+            ]
+        )
+
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         # Poll process.stdout to show stdout live
         while True:
@@ -78,10 +89,10 @@ class NodeBackend(BackendBase):
             if output:
                 print(output.decode().strip())
         rc = process.poll()
-        # if process.returncode != 0:
-        #     raise RuntimeError(
-        #         f"node return with returncode: {process.returncode} rc {rc}"
-        #     )
+        if process.returncode != 0:
+            raise RuntimeError(
+                f"node return with returncode: {process.returncode} rc {rc}"
+            )
 
         result_path = self.host_work_dir / "_node_result.json"
         if result_path.exists():

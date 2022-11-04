@@ -13,10 +13,10 @@ def write_main(to_mount_dir, script):
 
 
 class TestCli(object):
-    # def test_help(self):
-    #     result = runner.invoke(app, ["--help"])
-    #     assert result.exit_code == 0
-    #     assert "Usage:" in result.stdout
+    def test_help(self, runner):
+        result = runner.invoke(app, ["--help"])
+        assert result.exit_code == 0
+        assert "Usage:" in result.stdout
 
     def test_sync_err(
         self, env_prefix, em_work_dir, backend_cli_settings, tmpdir, runner
@@ -57,14 +57,6 @@ class TestCli(object):
         to_mount_dir = tmpdir
         cli_mount = f"{str(tmpdir)}:{str(em_work_dir)}"
 
-        print(
-            "test_async_error env_prefix",
-            env_prefix,
-            "cli_mount",
-            cli_mount,
-            "em_work_dir",
-            em_work_dir,
-        )
         backend_type, backend_args = backend_cli_settings
 
         main_content = """\n
@@ -131,14 +123,6 @@ class TestCli(object):
     ):
         to_mount_dir = tmpdir
         cli_mount = f"{str(tmpdir)}:{str(em_work_dir)}"
-        print(
-            "test_async_hello_world env_prefix",
-            env_prefix,
-            "cli_mount",
-            cli_mount,
-            "em_work_dir",
-            em_work_dir,
-        )
         backend_type, backend_args = backend_cli_settings
 
         main_content = """\n
