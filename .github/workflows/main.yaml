@@ -89,6 +89,7 @@ jobs:
           emsdk install ${{matrix.emsdk_ver}}
 
           python -m pip install . 
+          playwright install
         
       - name: Run Tests 
         run: |
