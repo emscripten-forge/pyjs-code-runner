@@ -43,7 +43,10 @@ _async_done_ = [False]
 _ret_code = [0]
 async def main_runner():
     try:
-        _ret_code[0] = await main()
+        ret = await main()
+        if ret is None:
+            ret = 0
+        _ret_code[0] = ret
     except Exception as e:
         _ret_code[0] = 1
         print("EXCEPTION",e)
