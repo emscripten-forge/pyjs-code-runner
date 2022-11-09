@@ -44,13 +44,11 @@ class TestCli(object):
         result = runner.invoke(app, cli_args)
         assert result.exit_code == 1
 
-    @pytest.mark.parametrize("execution_number", range(1))
     def test_async_error(
         self,
         env_prefix,
         em_work_dir,
         backend_cli_settings,
-        execution_number,
         tmpdir,
         runner,
     ):
@@ -111,13 +109,13 @@ class TestCli(object):
         assert result.exit_code == 0
         assert "hello world" in result.stdout
 
-    @pytest.mark.parametrize("execution_number", range(1))
+    @pytest.mark.parametrize("with_return", [False, True])
     def test_async_hello_world(
         self,
         env_prefix,
         em_work_dir,
         backend_cli_settings,
-        execution_number,
+        with_return,
         tmpdir,
         runner,
     ):
@@ -125,13 +123,21 @@ class TestCli(object):
         cli_mount = f"{str(tmpdir)}:{str(em_work_dir)}"
         backend_type, backend_args = backend_cli_settings
 
-        main_content = """\n
-            import asyncio
-            async def main():
-                await asyncio.sleep(1)
-                print('hello world')
-                return 0
-        """
+        if with_return:
+            main_content = """\n
+                import asyncio
+                async def main():
+                    await asyncio.sleep(1)
+                    print('hello world')
+                    return 0
+            """
+        else:
+            main_content = """\n
+                import asyncio
+                async def main():
+                    await asyncio.sleep(1)
+                    print('hello world')
+            """
         write_main(to_mount_dir, main_content)
 
         # fmt: off
