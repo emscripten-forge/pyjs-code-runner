@@ -2,6 +2,8 @@ from .backend.backend import BackendType, get_backend_type_family, get_backend_c
 from .constants import EXPORT_NAME_SUFFIX
 from .js_global_object import js_global_object
 from .work_dir_context import work_dir_context
+from .get_cache_dir import get_cache_dir
+
 import tempfile
 from pathlib import Path
 from empack.file_packager import pack_directory, pack_file, split_pack_environment
@@ -15,7 +17,6 @@ def pack_mounts(mounts, host_work_dir, backend_type, outdir):
 
     mount_js_files = []
     for mount_index, (host_path, em_path) in enumerate(mounts):
-        print(host_path, em_path)
         mount_name = f"mount_{mount_index}"
         mount_js_files.append(f"{mount_name}.js")
         if host_path.is_dir():
@@ -101,7 +102,6 @@ def pack_env(conda_env, backend_type, pkg_file_filter, cache_dir, use_cache, out
         folder_for_env.mkdir(parents=True, exist_ok=True)
 
         export_name = f"{js_global_object(backend_type)}.{EXPORT_NAME_SUFFIX}"
-        print("pack!")
         with work_dir_context(folder_for_env):
             split_pack_environment(
                 env_prefix=conda_env,
@@ -133,13 +133,18 @@ def run(
     async_main,
     mounts,
     work_dir,
-    pkg_file_filter,
-    pyjs_dir,
-    cache_dir,
-    use_cache,
-    host_work_dir,
-    backend_kwargs,
+    pkg_file_filter=None,
+    pyjs_dir=None,
+    cache_dir=None,
+    use_cache=False,
+    host_work_dir=None,
+    backend_kwargs=None,
 ):
+    if backend_kwargs is None:
+        backend_kwargs = dict()
+
+    if cache_dir is None:
+        cache_dir = get_cache_dir(cache_dir=None)
 
     # create a temporary host work directory
     with host_work_dir_context(host_work_dir) as host_work_dir:

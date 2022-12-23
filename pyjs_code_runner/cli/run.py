@@ -236,7 +236,10 @@ def run_script(
     if backend_kwargs is None:
         backend_kwargs = dict()
     mounts = parse_mounts(mounts)
-    cache_dir = get_cache_dir(cache_dir=cache_dir)
+    if use_cache:
+        cache_dir = get_cache_dir(cache_dir=cache_dir)
+    else:
+        cache_dir = None
     pkg_file_filter = get_file_filter(pkg_file_filter, cache_dir=cache_dir)
 
     run(

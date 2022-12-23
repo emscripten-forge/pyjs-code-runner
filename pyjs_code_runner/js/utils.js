@@ -21,12 +21,8 @@ globalThis.make_pyjs = make_pyjs
 
 function eval_main_script(pyjs, workdir, filename) {
     try{
-        console.log("pyjs.exec: import os")
         pyjs.exec("import os;from os.path import exists")
-        console.log("pyjs.exec: chdir")
         pyjs.exec(`os.chdir("${workdir}")`)
-        pyjs.exec(`print("${workdir}" + "/" +  "${filename}",exists("${workdir}" + "/" +  "${filename}"))`)
-        console.log("pyjs.eval_file:")
         pyjs.eval_file(filename);
         return 0;
     }
