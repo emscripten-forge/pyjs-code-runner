@@ -94,6 +94,10 @@ cache_dir_option = typer.Option(
     help="""cache-directory, if env-cache-dir is not specified, the an `appdir` is used""",
 )
 
+cache_option = typer.Option(
+    True,
+    help="""use cache""",
+)
 
 port_option = typer.Option(
     None,
@@ -124,6 +128,7 @@ def browser_main(
     pyjs_dir: Optional[Path] = pyjs_dir_option,
     host_work_dir: Optional[Path] = host_work_dir_option,
     cache_dir: Optional[Path] = cache_dir_option,
+    cache: bool = cache_option,
     port: Optional[int] = port_option,
     headless: bool = headless_option,
     slow_mo: Optional[int] = slowmo_option,
@@ -138,6 +143,7 @@ def browser_main(
         pkg_file_filter=pkg_file_filter,
         pyjs_dir=pyjs_dir,
         cache_dir=cache_dir,
+        use_cache=cache,
         host_work_dir=host_work_dir,
         backend_kwargs=dict(port=port, headless=headless, slow_mo=slow_mo),
     )
@@ -154,6 +160,7 @@ def browser_worker(
     pyjs_dir: Optional[Path] = pyjs_dir_option,
     host_work_dir: Optional[Path] = host_work_dir_option,
     cache_dir: Optional[Path] = cache_dir_option,
+    cache: bool = cache_option,
     port: Optional[int] = port_option,
     headless: bool = headless_option,
     slow_mo: Optional[int] = slowmo_option,
@@ -168,6 +175,7 @@ def browser_worker(
         pkg_file_filter=pkg_file_filter,
         pyjs_dir=pyjs_dir,
         cache_dir=cache_dir,
+        use_cache=cache,
         host_work_dir=host_work_dir,
         backend_kwargs=dict(port=port, headless=headless, slow_mo=slow_mo),
     )
@@ -191,6 +199,7 @@ def node(
     pyjs_dir: Optional[Path] = pyjs_dir_option,
     host_work_dir: Optional[Path] = host_work_dir_option,
     cache_dir: Optional[Path] = cache_dir_option,
+    cache: bool = cache_option,
     node_binary: Optional[Path] = node_binary_option,
 ):
     run_script(
@@ -203,6 +212,7 @@ def node(
         pkg_file_filter=pkg_file_filter,
         pyjs_dir=pyjs_dir,
         cache_dir=cache_dir,
+        use_cache=cache,
         host_work_dir=host_work_dir,
         backend_kwargs=dict(node_binary=node_binary),
     )
@@ -219,6 +229,7 @@ def run_script(
     pyjs_dir,
     host_work_dir,
     cache_dir,
+    use_cache,
     backend_kwargs=None,
 ):
 
@@ -238,6 +249,7 @@ def run_script(
         pkg_file_filter=pkg_file_filter,
         pyjs_dir=pyjs_dir,
         cache_dir=cache_dir,
+        use_cache=use_cache,
         host_work_dir=host_work_dir,
         backend_kwargs=backend_kwargs,
     )

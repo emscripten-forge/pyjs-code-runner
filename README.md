@@ -3,6 +3,15 @@
 
 A driver to run python code in a wasm environment, almost like running vanilla python code.
 
+## Motivation
+
+Debugging, experimenting and testing python code from a dedicated conda environment 
+in browser environment is a complex process with a lot of (complicated) steps.
+
+* create the environment for emscripten 
+* pack the environemtn
+
+
 
 ## Examples
 

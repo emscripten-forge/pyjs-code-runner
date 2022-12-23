@@ -37,7 +37,6 @@ class BrowserMainBackend(BackendBase):
             server,
             url,
         ):
-
             page_url = f"{url}/{browser_main_html}"
             ret = asyncio.run(self.playwright_run_in_main_thread(page_url=page_url))
             if ret != 0:

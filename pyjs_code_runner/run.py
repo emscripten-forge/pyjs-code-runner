@@ -15,6 +15,7 @@ def pack_mounts(mounts, host_work_dir, backend_type, outdir):
 
     mount_js_files = []
     for mount_index, (host_path, em_path) in enumerate(mounts):
+        print(host_path, em_path)
         mount_name = f"mount_{mount_index}"
         mount_js_files.append(f"{mount_name}.js")
         if host_path.is_dir():
@@ -88,7 +89,7 @@ def copy_pyjs(conda_env, backend_type, pyjs_dir, outdir):
         shutil.copyfile(source_dir / file, outdir / file)
 
 
-def pack_env(conda_env, backend_type, pkg_file_filter, cache_dir, outdir):
+def pack_env(conda_env, backend_type, pkg_file_filter, cache_dir, use_cache, outdir):
 
     outname = "packed_env"
     cache_folder_name = Path(
@@ -96,11 +97,11 @@ def pack_env(conda_env, backend_type, pkg_file_filter, cache_dir, outdir):
     )
     folder_for_env = cache_dir / cache_folder_name
     file_to_probe = folder_for_env / f"{outname}.js"
-    if not file_to_probe.exists():
+    if (not file_to_probe.exists()) or (not use_cache):
         folder_for_env.mkdir(parents=True, exist_ok=True)
 
         export_name = f"{js_global_object(backend_type)}.{EXPORT_NAME_SUFFIX}"
-
+        print("pack!")
         with work_dir_context(folder_for_env):
             split_pack_environment(
                 env_prefix=conda_env,
@@ -135,6 +136,7 @@ def run(
     pkg_file_filter,
     pyjs_dir,
     cache_dir,
+    use_cache,
     host_work_dir,
     backend_kwargs,
 ):
@@ -156,6 +158,7 @@ def run(
             outdir=host_work_dir,
             pkg_file_filter=pkg_file_filter,
             cache_dir=cache_dir,
+            use_cache=use_cache,
         )
 
         # pack all the mounts
