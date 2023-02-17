@@ -109,6 +109,7 @@ def pack_env(conda_env, backend_type, pkg_file_filter, cache_dir, use_cache, out
                 export_name=export_name,
                 pkg_file_filter=pkg_file_filter,
                 silent=True,
+                with_export_default_statement=True,
             )
 
     # copy from cache to work dir
