@@ -6,60 +6,35 @@ from .get_cache_dir import get_cache_dir
 
 import tempfile
 from pathlib import Path
-from empack.file_packager import pack_directory, pack_file, split_pack_environment
+from empack.pack import pack_env, pack_directory
+from empack.pack import DEFAULT_CONFIG_PATH as EMPACK_DEFAULT_CONFIG_PATH
+from empack.file_patterns import pkg_file_filter_from_yaml
+
 from contextlib import contextmanager
 import os
 import shutil
+import json
+import sys
 
+def pack_mounts(mounts, host_work_dir, backend_type):
 
-def pack_mounts(mounts, host_work_dir, backend_type, outdir):
-    export_name = f"{js_global_object(backend_type)}.{EXPORT_NAME_SUFFIX}"
 
     mount_js_files = []
     for mount_index, (host_path, em_path) in enumerate(mounts):
-        mount_name = f"mount_{mount_index}"
-        mount_js_files.append(f"{mount_name}.js")
+        mount_filename = f"mount_{mount_index}.tar.gz"
+        mount_js_files.append(mount_filename)
         if host_path.is_dir():
-            with work_dir_context(outdir):
-                pack_directory(
-                    directory=host_path,
-                    mount_path=em_path,
-                    outname=mount_name,
-                    export_name=export_name,
-                    silent=True,
-                )
+            pack_directory(host_dir=host_path,mount_dir=em_path,outname=mount_filename,outdir=host_work_dir, compresslevel=1)
+
         elif host_path.is_file():
             raise RuntimeError("packing files is not yet supported")
         else:
             raise RuntimeError(
                 f"host_path (={host_path}) in mounts is neither dir nor file"
             )
+    with open(host_work_dir / "mounts.json", "w") as f:
+        json.dump(mount_js_files, f, indent=4)
 
-    import_statements = [
-        f'promises.push(import("./{mod_name}"));' for mod_name in mount_js_files
-    ]
-
-    push_promises = "\n".join(import_statements)
-    if backend_type == BackendType.node:
-        module_code = f"""
-        async  function importMounts(){{
-            let promises = [];
-            {push_promises}
-            await Promise.all(promises);
-        }}\n
-        module.exports = importMounts
-        """
-    else:
-        module_code = f"""
-        export default async  function(){{
-            let promises = [];
-            {push_promises}
-            await Promise.all(promises);
-        }}\n
-        """
-
-    with open(outdir / "packed_mounts.js", "w") as f:
-        f.write(module_code)
 
 
 def conda_env_to_cache_name(conda_env, backend_type):
@@ -90,32 +65,6 @@ def copy_pyjs(conda_env, backend_type, pyjs_dir, outdir):
         shutil.copyfile(source_dir / file, outdir / file)
 
 
-def pack_env(conda_env, backend_type, pkg_file_filter, cache_dir, use_cache, outdir):
-
-    outname = "packed_env"
-    cache_folder_name = Path(
-        conda_env_to_cache_name(conda_env, backend_type=backend_type)
-    )
-    folder_for_env = cache_dir / cache_folder_name
-    file_to_probe = folder_for_env / f"{outname}.js"
-    if (not file_to_probe.exists()) or (not use_cache):
-        folder_for_env.mkdir(parents=True, exist_ok=True)
-
-        export_name = f"{js_global_object(backend_type)}.{EXPORT_NAME_SUFFIX}"
-        with work_dir_context(folder_for_env):
-            split_pack_environment(
-                env_prefix=conda_env,
-                outname=outname,
-                export_name=export_name,
-                pkg_file_filter=pkg_file_filter,
-                silent=True,
-                with_export_default_statement=True,
-            )
-
-    # copy from cache to work dir
-    shutil.copytree(folder_for_env, outdir, dirs_exist_ok=True)
-
-
 @contextmanager
 def host_work_dir_context(host_work_dir=None):
     if host_work_dir is None:
@@ -129,6 +78,7 @@ def host_work_dir_context(host_work_dir=None):
 
 def run(
     conda_env,
+    relocate_prefix,
     backend_type,
     script,
     async_main,
@@ -141,6 +91,9 @@ def run(
     host_work_dir=None,
     backend_kwargs=None,
 ):
+    if pkg_file_filter is None:
+        pkg_file_filter = pkg_file_filter_from_yaml(EMPACK_DEFAULT_CONFIG_PATH)
+
     if backend_kwargs is None:
         backend_kwargs = dict()
 
@@ -157,22 +110,21 @@ def run(
             pyjs_dir=pyjs_dir,
             outdir=host_work_dir,
         )
+
         # pack the environment itself
-        pack_env(
-            conda_env=conda_env,
-            backend_type=backend_type,
-            outdir=host_work_dir,
-            pkg_file_filter=pkg_file_filter,
-            cache_dir=cache_dir,
-            use_cache=use_cache,
-        )
+        pack_env(env_prefix=conda_env,
+                   relocate_prefix=relocate_prefix,
+                   file_filters=pkg_file_filter,
+                   use_cache=use_cache,
+                   cache_dir=cache_dir,
+                   outdir=host_work_dir,
+                   compresslevel=1)
 
         # pack all the mounts
         mount_js_files = pack_mounts(
             mounts=mounts,
-            host_work_dir=host_work_dir,
             backend_type=backend_type,
-            outdir=host_work_dir,
+            host_work_dir=host_work_dir,
         )
 
         # get the backend where the wasm code runs (ie node/browser-main/browser-worker)
@@ -186,3 +138,4 @@ def run(
 
         # run
         backend.run()
+       

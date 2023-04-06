@@ -15,17 +15,11 @@ from ..get_cache_dir import get_cache_dir
 from ..get_file_filter import get_file_filter
 from ..constants import EMSCRIPTEN_HOME
 
-# packaging
 run_app = typer.Typer()
 app.add_typer(run_app, name="run")
 
-
-# packaging
 script_app = typer.Typer()
 run_app.add_typer(script_app, name="script")
-
-
-# constants
 
 
 def parse_mounts(mounts):
@@ -54,10 +48,15 @@ def parse_mounts(mounts):
 
 conda_env_option = require_option(
     *make_names("conda-env"),
-    help="name of the conda environment in which to run the code",
+    help="host location of the conda environment in which to run the code",
 )
 script_option = require_option(
-    *make_names("script"), help="path of script INSIDE VIRTUAL FILESYSTEM to run"
+    *make_names("script"), help="path of script inside the virtual fileystem to run"
+)
+relocate_prefix_option =  typer.Option(
+    "/",
+    *make_names("relocate-prefix"),
+    help="location of the conda environment in the virtual file",
 )
 async_main_option = typer.Option(
     False,
@@ -123,6 +122,7 @@ def browser_main(
     script: Path = script_option,
     async_main: bool = async_main_option,
     mounts: List[str] = mounts_option,
+    relocate_prefix: Optional[Path] = relocate_prefix_option,
     work_dir: Optional[Path] = work_dir_option,
     pkg_file_filter: Optional[List[Path]] = pkg_file_filter_option,
     pyjs_dir: Optional[Path] = pyjs_dir_option,
@@ -136,6 +136,7 @@ def browser_main(
     run_script(
         backend_type=BackendType.browser_main,
         conda_env=conda_env,
+        relocate_prefix=relocate_prefix,
         script=script,
         async_main=async_main,
         mounts=mounts,
@@ -155,6 +156,7 @@ def browser_worker(
     script: Path = script_option,
     async_main: bool = async_main_option,
     mounts: List[str] = mounts_option,
+    relocate_prefix: Optional[Path] = relocate_prefix_option,
     work_dir: Optional[Path] = work_dir_option,
     pkg_file_filter: List[Path] = pkg_file_filter_option,
     pyjs_dir: Optional[Path] = pyjs_dir_option,
@@ -168,6 +170,7 @@ def browser_worker(
     run_script(
         backend_type=BackendType.browser_worker,
         conda_env=conda_env,
+        relocate_prefix=relocate_prefix,
         script=script,
         async_main=async_main,
         mounts=mounts,
@@ -194,6 +197,7 @@ def node(
     script: Path = script_option,
     async_main: bool = async_main_option,
     mounts: List[str] = mounts_option,
+    relocate_prefix: Optional[Path] = relocate_prefix_option,
     work_dir: Optional[Path] = work_dir_option,
     pkg_file_filter: List[Path] = pkg_file_filter_option,
     pyjs_dir: Optional[Path] = pyjs_dir_option,
@@ -205,6 +209,7 @@ def node(
     run_script(
         backend_type=BackendType.node,
         conda_env=conda_env,
+        relocate_prefix=relocate_prefix,
         script=script,
         async_main=async_main,
         mounts=mounts,
@@ -221,6 +226,7 @@ def node(
 def run_script(
     backend_type,
     conda_env,
+    relocate_prefix,
     script,
     async_main,
     mounts,
@@ -244,6 +250,7 @@ def run_script(
 
     run(
         conda_env=conda_env,
+        relocate_prefix=relocate_prefix,
         backend_type=backend_type,
         script=script,
         async_main=async_main,
