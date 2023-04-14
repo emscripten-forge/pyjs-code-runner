@@ -58,17 +58,17 @@ class BrowserMainBackend(BackendBase):
 
             async def handle_console(msg):
                 txt = str(msg)
-                if (
-                    txt.startswith(
-                        "warning: Browser does not support creating object URLs"
-                    )
-                    or txt.startswith("Failed to load resource:")
-                    or txt.startswith("Could not find platform dependent libraries")
-                    or txt.startswith("Consider setting $PYTHONHOME")
-                ):
-                    pass
-                else:
-                    print(txt)
+                # if (
+                #     txt.startswith(
+                #         "warning: Browser does not support creating object URLs"
+                #     )
+                #     or txt.startswith("Failed to load resource:")
+                #     or txt.startswith("Could not find platform dependent libraries")
+                #     or txt.startswith("Consider setting $PYTHONHOME")
+                # ):
+                #     pass
+                # else:
+                print(txt)
 
             page.on("console", handle_console)
 

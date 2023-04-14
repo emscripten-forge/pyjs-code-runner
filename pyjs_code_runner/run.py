@@ -32,7 +32,7 @@ def pack_mounts(mounts, host_work_dir, backend_type):
             raise RuntimeError(
                 f"host_path (={host_path}) in mounts is neither dir nor file"
             )
-    with open(host_work_dir / "mounts.json", "w") as f:
+    with open(Path(host_work_dir) / "mounts.json", "w") as f:
         json.dump(mount_js_files, f, indent=4)
 
 
@@ -62,7 +62,7 @@ def copy_pyjs(conda_env, backend_type, pyjs_dir, outdir):
             )
 
     for file in files:
-        shutil.copyfile(source_dir / file, outdir / file)
+        shutil.copyfile(Path(source_dir) / file, Path(outdir) / file)
 
 
 @contextmanager
@@ -91,6 +91,9 @@ def run(
     host_work_dir=None,
     backend_kwargs=None,
 ):
+    if host_work_dir is not None:
+        host_work_dir = Path(host_work_dir)
+        
     if pkg_file_filter is None:
         pkg_file_filter = pkg_file_filter_from_yaml(EMPACK_DEFAULT_CONFIG_PATH)
 
@@ -118,7 +121,7 @@ def run(
                    use_cache=use_cache,
                    cache_dir=cache_dir,
                    outdir=host_work_dir,
-                   compresslevel=1)
+                   compresslevel=9)
 
         # pack all the mounts
         mount_js_files = pack_mounts(
