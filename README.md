@@ -20,9 +20,9 @@ in browser environment is a complex process with a lot of (complicated) steps.
 Here we assume a file `main.py` located at `~/foo/bar/main.py`.
 
 ```bash
-# run with node
+# run in browser-main-thread backend 
 pyjs_code_runner run script                                                                \
-    node                                                                                   \
+    browser-main                                                                           \
     --conda-env     ~/micromamba/envs/my_env         `# the emscripten-forge env`          \
                                                      `# in which to run the code`          \
                                                                                            \
@@ -37,24 +37,9 @@ pyjs_code_runner run script                                                     
                                                                                            \
     --async-main                                     `# should a top-level async`          \
                                                      `# function named main be called`     \
-
-```
-
-
-```bash
-# run in browser-main-thread backend 
-# in a headless fashion
-pyjs_code_runner run script \
-    browser-main \
-    --conda-env     ~/micromamba/envs/my_env \
-    --mount         ~/foo/bar:/home/web_user/fubar \
-    --script        main.py \
-    --work-dir      /tests \
-    --async-main           \
     --headless 
 
 ```
-
 
 ```bash
 # run in browser-worker-thread backend 
