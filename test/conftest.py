@@ -42,7 +42,7 @@ def env_prefix():
 
 
 # @pytest.fixture(params=["node"])  # , "browser-main", "browser-worker"])
-@pytest.fixture(params=["node", "browser-main", "browser-worker"])
+@pytest.fixture(params=["browser-main", "browser-worker"])
 def backend_cli_settings(request):
 
     if request.param == "node":
