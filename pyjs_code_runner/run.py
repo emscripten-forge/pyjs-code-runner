@@ -91,6 +91,7 @@ def run(
     host_work_dir=None,
     backend_kwargs=None,
 ):
+    relocate_prefix = str(relocate_prefix)
     if host_work_dir is not None:
         host_work_dir = Path(host_work_dir)
         
