@@ -3,7 +3,7 @@ import textwrap
 
 
 class BackendFamilyType(str, Enum):
-    browser = "browsef"
+    browser = "browser"
     node = "node"
 
 
@@ -61,9 +61,8 @@ def ensure_playwright_imports():
 
 def get_backend_cls(backend_type):
     if backend_type == BackendType.node:
-        from .node.node import NodeBackend
+        raise RuntimeError("the node backend is currently disabled as its not (yet) working with empack>=3.0.0")
 
-        return NodeBackend
 
     elif backend_type == BackendType.browser_main:
         ensure_playwright_imports()

@@ -101,9 +101,6 @@ class BrowserWorkerBackend(BackendBase):
                     txt.startswith(
                         "warning: Browser does not support creating object URLs"
                     )
-                    or txt.startswith("Failed to load resource:")
-                    or txt.startswith("Could not find platform dependent libraries")
-                    or txt.startswith("Consider setting $PYTHONHOME")
                 ):
                     pass
                 else:

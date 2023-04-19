@@ -1,33 +1,51 @@
+async function fetchMount(pyjs, mount){
+    let url = `./${mount}`;
+    let filename = `/mount_tarballs/${mount}`;
+    let byte_array = await pyjs._fetch_byte_array(url, filename);
+    pyjs.FS.writeFile(filename, byte_array);
+    pyjs._untar_from_python(filename, "/");
+}
+
+async function fetchMounts(pyjs) {
+    let response = await fetch("./mounts.json");
+    if (!response.ok) {
+        throw new Error(`HTTP error while fetching ./mounts.json! status: ${response.status}`);
+    }
+    let mounts = await response.json();
+    pyjs.FS.mkdir("/mount_tarballs");
+    await Promise.all(mounts.map(mount => fetchMount(pyjs, mount)));
+    
+}
+
 async function make_pyjs(print, error) {
-    var pyjs = await createModule({print:print,error:print})
-    var EmscriptenForgeModule = pyjs
-    globalThis.EmscriptenForgeModule = pyjs
+    var pyjs = await createModule({ print: print, error: print })
+    
+   await pyjs.bootstrap_from_empack_packed_environment(
+        `./empack_env_meta.json`, /* packages_json_url */
+        ".",               /* package_tarballs_root_url */
+        false              /* verbose */
+    );
+
+    await fetchMounts(pyjs);
+    //await Promise.all([promise_env, promise_mount]);
+
+    //await pyjs.init()
+
     globalThis.pyjs = pyjs
-
-    const { default: importPackages }  = await import("./packed_env.js")
-    await importPackages();
-
-    const { default: importMounts }  = await import("./packed_mounts.js")
-    await importMounts();
-        
-    await pyjs.init()
-
     return pyjs
 }
 
 globalThis.make_pyjs = make_pyjs
 
-
-
 function eval_main_script(pyjs, workdir, filename) {
-    try{
+    try {
         pyjs.exec("import os;from os.path import exists")
         pyjs.exec(`os.chdir("${workdir}")`)
         pyjs.eval_file(filename);
         return 0;
     }
-    catch(e){
-        console.error("error while evaluating main file:",e)
+    catch (e) {
+        console.error("error while evaluating main file:", e)
         return 1;
     }
     return 0
@@ -56,36 +74,25 @@ async def main_runner():
 asyncio.ensure_future(main_runner())
     `)
 
-    while(true)
-    {
+    while (true) {
         await new Promise(resolve => setTimeout(resolve, 100));
         const _async_done_ = pyjs.eval("_async_done_[0]")
-        if(_async_done_)
-        {
+        if (_async_done_) {
             break;
         }
     }
     return pyjs.eval("_ret_code[0]")
-                
+
 }
 globalThis.run_async_python_main = run_async_python_main
 
-// export { make_pyjs, run_async_python_main, eval_main_script };
 
-
-if (typeof exports === 'object' && typeof module === 'object'){
-    console.log("A")
-  module.exports = make_pyjs;
+if (typeof exports === 'object' && typeof module === 'object') {
+    module.exports = make_pyjs;
 }
-else if (typeof define === 'function' && define['amd']){
-    console.log("B")
-  define([], function() { return make_pyjs; });
+else if (typeof define === 'function' && define['amd']) {
+    define([], function () { return make_pyjs; });
 }
-else if (typeof exports === 'object'){
-    console.log("C")
-  exports["make_pyjs"] = make_pyjs;
+else if (typeof exports === 'object') {
+    exports["make_pyjs"] = make_pyjs;
 }
-// else{
-//     console.log("D")
-//     export { make_pyjs, run_async_python_main, eval_main_script };
-// }

@@ -19,8 +19,6 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        emsdk_ver: ["3.1.2"]
 
     steps:
       - uses: actions/checkout@v2
@@ -33,16 +31,11 @@ jobs:
         with:
           environment-file: dev-env.yml
           environment-name: dev-env
-          micromamba-version: "0.22.0"
+          micromamba-version: "1.4.1"
 
       - name: Install Playwright
         run: |
           playwright install
-
-      - name: Setup emsdk
-        run: |
-          micromamba activate dev-env
-          emsdk install ${{matrix.emsdk_ver}}
 
       - name: Install pyjs-code-runner
         run: |
@@ -52,9 +45,6 @@ jobs:
       - name: Run Tests 
         run: |
           micromamba activate dev-env
-          emsdk activate ${{matrix.emsdk_ver}}
-          source $CONDA_EMSDK_DIR/emsdk_env.sh
-
           pytest -s
 
 
@@ -64,8 +54,6 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        emsdk_ver: ["3.1.2"]
 
     steps:
       - uses: actions/checkout@v2
@@ -78,22 +66,17 @@ jobs:
         with:
           environment-file: dev-env-pip.yml
           environment-name: dev-env
-          micromamba-version: "0.22.0"
+          micromamba-version: "1.4.1"
 
-      
       - name: Install pyjs-code-runner
         run: |
           micromamba activate dev-env
-          emsdk install ${{matrix.emsdk_ver}}
-
           python -m pip install . 
           playwright install
         
       - name: Run Tests 
         run: |
           micromamba activate dev-env
-          emsdk activate ${{matrix.emsdk_ver}}
-          source $CONDA_EMSDK_DIR/emsdk_env.sh
 
           pytest -s
 

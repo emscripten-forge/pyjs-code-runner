@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-requirements = ["typer", "playwright", "appdirs", "empack >=2.0.0", "rich"]
+requirements = ["typer", "playwright", "appdirs", "empack >=3.0.0", "rich"]
 
 setup(
     author="Thorsten Beier",
@@ -14,11 +14,8 @@ setup(
     classifiers=[
         "Intended Audience :: Developers",
         "Natural Language :: English",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
     include_package_data=True,
     description="pyjs_code_runner emscripten+boa",
@@ -34,6 +31,6 @@ setup(
     name="pyjs_code_runner",
     packages=find_packages(),
     url="https://github.com/emscripten-forge/pyjs_code_runner",
-    version="1.1.0",
+    version="2.0.0",
     zip_safe=False,
 )
