@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-requirements = ["typer", "playwright", "appdirs", "empack >=2.0.0", "rich"]
+requirements = ["typer", "playwright", "appdirs", "empack >=3.0.0", "rich"]
 
 setup(
     author="Thorsten Beier",

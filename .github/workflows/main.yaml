@@ -39,10 +39,6 @@ jobs:
         run: |
           playwright install
 
-      - name: Setup emsdk
-        run: |
-          micromamba activate dev-env
-          emsdk install ${{matrix.emsdk_ver}}
 
       - name: Install pyjs-code-runner
         run: |
