@@ -7,7 +7,7 @@ dependencies:
   - pytest
   - typer
   - appdirs
-  - empack >=2.0.0
+  - empack >=3,<4
   - microsoft::playwright
   - emsdk
   - rich
