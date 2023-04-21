@@ -6,7 +6,6 @@ import textwrap
 
 
 def write_main(to_mount_dir, script):
-
     script = textwrap.dedent(script)
     with open(to_mount_dir / "main.py", "w") as f:
         f.write(script)
@@ -85,7 +84,6 @@ class TestCli(object):
     def test_sync_hello_world(
         self, env_prefix, em_work_dir, backend_cli_settings, tmpdir, runner
     ):
-
         to_mount_dir = tmpdir
         cli_mount = f"{str(tmpdir)}:{str(em_work_dir)}"
         backend_type, backend_args = backend_cli_settings

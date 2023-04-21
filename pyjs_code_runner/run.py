@@ -16,15 +16,20 @@ import shutil
 import json
 import sys
 
+
 def pack_mounts(mounts, host_work_dir, backend_type):
-
-
     mount_js_files = []
     for mount_index, (host_path, em_path) in enumerate(mounts):
         mount_filename = f"mount_{mount_index}.tar.gz"
         mount_js_files.append(mount_filename)
         if host_path.is_dir():
-            pack_directory(host_dir=host_path,mount_dir=em_path,outname=mount_filename,outdir=host_work_dir, compresslevel=1)
+            pack_directory(
+                host_dir=host_path,
+                mount_dir=em_path,
+                outname=mount_filename,
+                outdir=host_work_dir,
+                compresslevel=1,
+            )
 
         elif host_path.is_file():
             raise RuntimeError("packing files is not yet supported")
@@ -34,7 +39,6 @@ def pack_mounts(mounts, host_work_dir, backend_type):
             )
     with open(Path(host_work_dir) / "mounts.json", "w") as f:
         json.dump(mount_js_files, f, indent=4)
-
 
 
 def conda_env_to_cache_name(conda_env, backend_type):
@@ -94,7 +98,7 @@ def run(
     relocate_prefix = str(relocate_prefix)
     if host_work_dir is not None:
         host_work_dir = Path(host_work_dir)
-        
+
     if pkg_file_filter is None:
         pkg_file_filter = pkg_file_filter_from_yaml(EMPACK_DEFAULT_CONFIG_PATH)
 
@@ -106,7 +110,6 @@ def run(
 
     # create a temporary host work directory
     with host_work_dir_context(host_work_dir) as host_work_dir:
-
         # copy pyjs-runtime to host-work-dir
         copy_pyjs(
             conda_env=conda_env,
@@ -116,13 +119,15 @@ def run(
         )
 
         # pack the environment itself
-        pack_env(env_prefix=conda_env,
-                   relocate_prefix=relocate_prefix,
-                   file_filters=pkg_file_filter,
-                   use_cache=use_cache,
-                   cache_dir=cache_dir,
-                   outdir=host_work_dir,
-                   compresslevel=9)
+        pack_env(
+            env_prefix=conda_env,
+            relocate_prefix=relocate_prefix,
+            file_filters=pkg_file_filter,
+            use_cache=use_cache,
+            cache_dir=cache_dir,
+            outdir=host_work_dir,
+            compresslevel=9,
+        )
 
         # pack all the mounts
         mount_js_files = pack_mounts(
@@ -142,4 +147,3 @@ def run(
 
         # run
         backend.run()
-       

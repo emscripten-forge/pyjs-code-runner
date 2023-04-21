@@ -17,7 +17,6 @@ if "GITHUB_ACTION" in os.environ:
 
 @pytest.fixture(scope="session")
 def env_prefix():
-
     env_root = Path(appdirs.user_data_dir("pytest_code_runner_tests", "DerThorsten"))
     env_root.mkdir(exist_ok=True, parents=True)
     env_prefix = Path(env_root) / "testenv"
@@ -44,7 +43,6 @@ def env_prefix():
 # @pytest.fixture(params=["node"])  # , "browser-main", "browser-worker"])
 @pytest.fixture(params=["browser-main", "browser-worker"])
 def backend_cli_settings(request):
-
     if request.param == "node":
         if ON_GITHUB_ACTIONS:
             return request.param, [
