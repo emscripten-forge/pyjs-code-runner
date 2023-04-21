@@ -126,6 +126,13 @@ def run(
             compresslevel=9,
         )
 
+        # pack all the mounts
+        pack_mounts(
+            mounts=mounts,
+            backend_type=backend_type,
+            host_work_dir=host_work_dir,
+        )
+
         # get the backend where the wasm code runs (ie node/browser-main/browser-worker)
         backend = get_backend_cls(backend_type=backend_type)(
             host_work_dir=host_work_dir,
