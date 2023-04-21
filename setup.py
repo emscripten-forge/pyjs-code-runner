@@ -21,7 +21,7 @@ setup(
     description="pyjs_code_runner emscripten+boa",
     entry_points={
         "console_scripts": [
-            "pyjs_code_runner=pyjs_code_runner.cli.main:app",
+            "pyjs_code_runner=pyjs_code_runner.cli.app:app",
         ],
     },
     install_requires=requirements,
