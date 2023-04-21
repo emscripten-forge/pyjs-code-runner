@@ -1,7 +1,5 @@
-import os
 from pathlib import Path
 from typing import List, Optional
-import json
 import typer
 
 
@@ -245,7 +243,7 @@ def run_script(
         cache_dir = get_cache_dir(cache_dir=cache_dir)
     else:
         cache_dir = None
-    pkg_file_filter = get_file_filter(pkg_file_filter, cache_dir=cache_dir)
+    pkg_file_filter = get_file_filter(pkg_file_filter)
 
     run(
         conda_env=conda_env,

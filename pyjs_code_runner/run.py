@@ -1,6 +1,4 @@
 from .backend.backend import BackendType, get_backend_type_family, get_backend_cls
-from .constants import EXPORT_NAME_SUFFIX
-from .js_global_object import js_global_object
 from .work_dir_context import work_dir_context
 from .get_cache_dir import get_cache_dir
 
@@ -14,7 +12,6 @@ from contextlib import contextmanager
 import os
 import shutil
 import json
-import sys
 
 
 def pack_mounts(mounts, host_work_dir, backend_type):
@@ -127,13 +124,6 @@ def run(
             cache_dir=cache_dir,
             outdir=host_work_dir,
             compresslevel=9,
-        )
-
-        # pack all the mounts
-        mount_js_files = pack_mounts(
-            mounts=mounts,
-            backend_type=backend_type,
-            host_work_dir=host_work_dir,
         )
 
         # get the backend where the wasm code runs (ie node/browser-main/browser-worker)
