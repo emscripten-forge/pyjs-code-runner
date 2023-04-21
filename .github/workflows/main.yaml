@@ -12,14 +12,8 @@ defaults:
 
 
 jobs:
-
   test_with_conda:
-
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-
     steps:
       - uses: actions/checkout@v2
 
@@ -41,20 +35,15 @@ jobs:
         run: |
           micromamba activate dev-env
           python -m pip install . --no-deps
-        
-      - name: Run Tests 
+
+      - name: Run Tests
         run: |
           micromamba activate dev-env
           pytest -s
 
 
   test_with_pip:
-
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-
     steps:
       - uses: actions/checkout@v2
 
@@ -71,13 +60,10 @@ jobs:
       - name: Install pyjs-code-runner
         run: |
           micromamba activate dev-env
-          python -m pip install . 
+          python -m pip install .
           playwright install
-        
-      - name: Run Tests 
+
+      - name: Run Tests
         run: |
           micromamba activate dev-env
-
           pytest -s
-
- 
