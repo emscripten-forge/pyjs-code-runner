@@ -26,7 +26,7 @@ mamba activate pyjs-code-runner
 Then install `pyjs-code-runner`:
 
 ```bash
-git clone
+git clone https://github.com/emscripten-forge/pyjs-code-runner
 cd pyjs-code-runner
 python -m pip install -e .
 ```
