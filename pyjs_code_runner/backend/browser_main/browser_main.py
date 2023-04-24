@@ -28,7 +28,6 @@ class BrowserMainBackend(BackendBase):
         self.slow_mo = slow_mo
 
     def run(self):
-
         browser_main_html = "browser_main.html"
         main = HTML_DIR / browser_main_html
         shutil.copyfile(main, self.host_work_dir / browser_main_html)

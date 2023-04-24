@@ -25,7 +25,6 @@ class BrowserWorkerBackend(BackendBase):
         self.slow_mo = slow_mo
 
     def run(self):
-
         # copy html
         browser_worker_html = "browser_worker.html"
         main = HTML_DIR / browser_worker_html
@@ -40,7 +39,6 @@ class BrowserWorkerBackend(BackendBase):
             server,
             url,
         ):
-
             page_url = f"{url}/{browser_worker_html}"
             ret = asyncio.run(self.playwright_run_in_worker_thread(page_url=page_url))
             if ret != 0:
@@ -97,10 +95,8 @@ class BrowserWorkerBackend(BackendBase):
 
             async def handle_console(msg):
                 txt = str(msg)
-                if (
-                    txt.startswith(
-                        "warning: Browser does not support creating object URLs"
-                    )
+                if txt.startswith(
+                    "warning: Browser does not support creating object URLs"
                 ):
                     pass
                 else:

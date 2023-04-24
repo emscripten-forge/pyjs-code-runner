@@ -1,7 +1,5 @@
-import os
 from pathlib import Path
 from typing import List, Optional
-import json
 import typer
 
 
@@ -53,7 +51,7 @@ conda_env_option = require_option(
 script_option = require_option(
     *make_names("script"), help="path of script inside the virtual fileystem to run"
 )
-relocate_prefix_option =  typer.Option(
+relocate_prefix_option = typer.Option(
     "/",
     *make_names("relocate-prefix"),
     help="location of the conda environment in the virtual file",
@@ -238,7 +236,6 @@ def run_script(
     use_cache,
     backend_kwargs=None,
 ):
-
     if backend_kwargs is None:
         backend_kwargs = dict()
     mounts = parse_mounts(mounts)
@@ -246,7 +243,7 @@ def run_script(
         cache_dir = get_cache_dir(cache_dir=cache_dir)
     else:
         cache_dir = None
-    pkg_file_filter = get_file_filter(pkg_file_filter, cache_dir=cache_dir)
+    pkg_file_filter = get_file_filter(pkg_file_filter)
 
     run(
         conda_env=conda_env,

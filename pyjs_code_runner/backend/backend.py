@@ -61,8 +61,9 @@ def ensure_playwright_imports():
 
 def get_backend_cls(backend_type):
     if backend_type == BackendType.node:
-        raise RuntimeError("the node backend is currently disabled as its not (yet) working with empack>=3.0.0")
-
+        raise RuntimeError(
+            "the node backend is currently disabled as its not (yet) working with empack>=3.0.0"
+        )
 
     elif backend_type == BackendType.browser_main:
         ensure_playwright_imports()
