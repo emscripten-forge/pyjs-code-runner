@@ -8,6 +8,7 @@ build-backend = "hatchling.build"
 name = "pyjs-code-runner"
 description = "A driver to run wasm code from an emscripten-forge coda env like normal python code"
 readme = "README.md"
+license = { file = "LICENSE" }
 authors = [
     { name = "Thorsten Beier", email = "derthorstenbeier@gmail.com" },
 ]
@@ -27,10 +28,10 @@ dependencies = [
     "rich",
     "typer",
 ]
-version = "2.0.1"
+dynamic = ["version"]
 
-[project.license]
-file = "LICENSE"
+[tool.hatch.version]
+path = "pyjs_code_runner/version.py"
 
 [project.scripts]
 pyjs_code_runner = "pyjs_code_runner.cli.main:app"
