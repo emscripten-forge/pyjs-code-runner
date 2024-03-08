@@ -26,7 +26,7 @@ async function make_pyjs(print, error) {
         false              /* verbose */
     );
 
-    await fetchMounts(pyjs);
+    // await fetchMounts(pyjs);
     //await Promise.all([promise_env, promise_mount]);
 
     //await pyjs.init()
