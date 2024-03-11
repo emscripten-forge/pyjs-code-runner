@@ -4,7 +4,7 @@ from .get_cache_dir import get_cache_dir
 
 import tempfile
 from pathlib import Path
-from empack.pack import pack_env, pack_directory
+from empack.pack import pack_env, pack_directory,add_tarfile_to_env_meta
 from empack.pack import DEFAULT_CONFIG_PATH as EMPACK_DEFAULT_CONFIG_PATH
 from empack.file_patterns import pkg_file_filter_from_yaml
 
@@ -36,6 +36,7 @@ def pack_mounts(mounts, host_work_dir, backend_type):
             )
     with open(Path(host_work_dir) / "mounts.json", "w") as f:
         json.dump(mount_js_files, f, indent=4)
+    return mount_js_files
 
 
 def conda_env_to_cache_name(conda_env, backend_type):
@@ -124,14 +125,26 @@ def run(
             cache_dir=cache_dir,
             outdir=host_work_dir,
             compresslevel=9,
-        )
+        ) 
+        env_meta_filename = Path(host_work_dir) / "empack_env_meta.json"
 
+
+
+        #raise RuntimeError("stop here")
         # pack all the mounts
-        pack_mounts(
+        mount_files = pack_mounts(
             mounts=mounts,
             backend_type=backend_type,
             host_work_dir=host_work_dir,
         )
+        for mount_file in mount_files:
+            print(f"mount_file: {mount_file}")
+            try:
+                add_tarfile_to_env_meta(
+                    env_meta_filename=env_meta_filename, tarfile=mount_file
+                )
+            except shutil.SameFileError:
+                pass
 
         # get the backend where the wasm code runs (ie node/browser-main/browser-worker)
         backend = get_backend_cls(backend_type=backend_type)(
