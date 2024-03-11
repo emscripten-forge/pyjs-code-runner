@@ -139,9 +139,12 @@ def run(
         )
         for mount_file in mount_files:
             print(f"mount_file: {mount_file}")
-            add_tarfile_to_env_meta(
-                env_meta_filename=env_meta_filename, tarfile=mount_file
-            )
+            try:
+                add_tarfile_to_env_meta(
+                    env_meta_filename=env_meta_filename, tarfile=mount_file
+                )
+            except shutil.SameFileError:
+                pass
 
         # get the backend where the wasm code runs (ie node/browser-main/browser-worker)
         backend = get_backend_cls(backend_type=backend_type)(
