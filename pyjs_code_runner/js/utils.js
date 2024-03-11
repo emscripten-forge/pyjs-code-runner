@@ -25,12 +25,6 @@ async function make_pyjs(print, error) {
         ".",               /* package_tarballs_root_url */
         false              /* verbose */
     );
-
-    // await fetchMounts(pyjs);
-    //await Promise.all([promise_env, promise_mount]);
-
-    //await pyjs.init()
-
     globalThis.pyjs = pyjs
     return pyjs
 }

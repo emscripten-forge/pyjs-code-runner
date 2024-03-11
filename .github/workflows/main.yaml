@@ -30,12 +30,6 @@ jobs:
       - name: Install Playwright
         run: |
           playwright install
-      
-      # # temporary workaround to get main from empack
-      # - name: install empack main
-      #   run: |
-      #     micromamba activate dev-env
-      #     pip install git+https://github.com/emscripten-forge/empack.git@main --no-deps --no-build-isolation
 
       - name: Install pyjs-code-runner
         run: |
