@@ -6,7 +6,7 @@ dependencies:
   - pip
   - pytest
   - typer
-  - appdirs
+  - platformdirs
   - empack >=3,<4
   - microsoft::playwright
   - emsdk

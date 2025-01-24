@@ -1,7 +1,7 @@
 import pytest
 import subprocess
 from pathlib import Path
-import appdirs
+import platformdirs
 import shutil
 from typer.testing import CliRunner
 import os
@@ -17,7 +17,7 @@ if "GITHUB_ACTION" in os.environ:
 
 @pytest.fixture(scope="session")
 def env_prefix():
-    env_root = Path(appdirs.user_data_dir("pytest_code_runner_tests", "DerThorsten"))
+    env_root = Path(platformdirs.user_data_dir("pytest_code_runner_tests"))
     env_root.mkdir(exist_ok=True, parents=True)
     env_prefix = Path(env_root) / "testenv"
 

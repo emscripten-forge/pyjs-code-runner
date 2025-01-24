@@ -22,7 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 dependencies = [
-    "appdirs",
+    "platformdirs",
     "empack >=3.0.0",
     "playwright",
     "rich",
