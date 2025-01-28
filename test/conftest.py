@@ -21,7 +21,7 @@ def env_prefix(tmp_path_factory):
     # env_root.mkdir(exist_ok=True, parents=True)
     # env_prefix = Path(env_root) / "testenv"
 
-    env_root =  = tmp_path_factory.mktemp("pytest_code_runner_tests")
+    env_root = tmp_path_factory.mktemp("pytest_code_runner_tests")
     env_prefix = Path(env_root) / "testenv"
 
     if env_prefix.exists():
