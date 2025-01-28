@@ -21,24 +21,26 @@ jobs:
         uses: SimenB/github-actions-cpu-cores@v1
 
       - name: Install mamba
-        uses: mamba-org/provision-with-micromamba@main
+        uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: dev-env.yml
           environment-name: dev-env
-          micromamba-version: "1.4.1"
+          init-shell: >-
+            bash
 
       - name: Install Playwright
+        shell: bash -el {0}
         run: |
           playwright install
 
       - name: Install pyjs-code-runner
+        shell: bash -el {0}
         run: |
-          micromamba activate dev-env
           python -m pip install . --no-deps
 
       - name: Run Tests
+        shell: bash -el {0}
         run: |
-          micromamba activate dev-env
           pytest -s
 
 
@@ -58,12 +60,12 @@ jobs:
           micromamba-version: "1.4.1"
 
       - name: Install pyjs-code-runner
+        shell: bash -el {0}
         run: |
-          micromamba activate dev-env
           python -m pip install .
           playwright install
 
       - name: Run Tests
+        shell: bash -el {0}
         run: |
-          micromamba activate dev-env
           pytest -s
