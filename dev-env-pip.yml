@@ -4,5 +4,9 @@ channels:
 dependencies:
   - python
   - pip
-  - emsdk
   - pytest
+  - pytest-sugar
+  - typer
+  - appdirs
+  - empack >=3,<4
+  - rich
