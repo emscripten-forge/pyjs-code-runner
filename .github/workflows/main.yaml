@@ -67,4 +67,4 @@ jobs:
       - name: Run Tests
         shell: bash -el {0}
         run: |
-          pytest -s -vvv 
+          pytest -s -vvvvv 
