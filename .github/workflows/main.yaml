@@ -41,7 +41,7 @@ jobs:
       - name: Run Tests
         shell: bash -el {0}
         run: |
-          pytest -s
+          pytest -s -vvv 
 
 
   test_with_pip:
@@ -67,4 +67,4 @@ jobs:
       - name: Run Tests
         shell: bash -el {0}
         run: |
-          pytest -s
+          pytest -s -vvv 
