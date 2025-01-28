@@ -40,7 +40,7 @@ function eval_main_script(pyjs, workdir, filename) {
     }
     catch (e) {
         if (typeof e === "number") {
-            const msg = get_exception_message(e);
+            const msg = pyjs.get_exception_message(e);
             console.error("error while evaluating main file:", msg)
         }
         else {
