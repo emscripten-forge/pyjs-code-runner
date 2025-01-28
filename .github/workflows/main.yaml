@@ -53,11 +53,10 @@ jobs:
         uses: SimenB/github-actions-cpu-cores@v1
 
       - name: Install mamba
-        uses: mamba-org/provision-with-micromamba@main
+        uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: dev-env-pip.yml
           environment-name: dev-env
-          micromamba-version: "1.4.1"
 
       - name: Install pyjs-code-runner
         shell: bash -el {0}
