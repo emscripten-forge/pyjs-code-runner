@@ -21,17 +21,31 @@ jobs:
       - name: Get number of CPU cores
         uses: SimenB/github-actions-cpu-cores@v1
       
+      - name: apt-install
+        run: sudo apt-get install -y  \
+            libwoff1\ 
+            libvpx9\
+            libevent-2.1-7t64\
+            libopus0\
+            libgstreamer-plugins-base1.0-0\
+            libgstreamer-gl1.0-0\
+            libgstreamer-plugins-bad1.0-0\
+            libflite1\
+            libavif16\
+            libharfbuzz-icu0\
+            libsecret-1-0\
+            libhyphen0\
+            libmanette-0.2-0\
+            libgles2\
+            gstreamer1.0-libav         
+      
       - name: Install mamba
         uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: dev-env.yml
           environment-name: dev-env
           init-shell: >-
-            bash
-
-      - name: Install playwright dependencies
-        shell: bash -el {0}
-        run: sudo playwright install-deps         
+            bash     
           
       - name: Install Playwright
         shell: bash -el {0}
@@ -57,6 +71,24 @@ jobs:
       - name: Get number of CPU cores
         uses: SimenB/github-actions-cpu-cores@v1
 
+      - name: apt-install
+        run: sudo apt-get install -y  \
+            libwoff1\ 
+            libvpx9\
+            libevent-2.1-7t64\
+            libopus0\
+            libgstreamer-plugins-base1.0-0\
+            libgstreamer-gl1.0-0\
+            libgstreamer-plugins-bad1.0-0\
+            libflite1\
+            libavif16\
+            libharfbuzz-icu0\
+            libsecret-1-0\
+            libhyphen0\
+            libmanette-0.2-0\
+            libgles2\
+            gstreamer1.0-libav      
+
       - name: Install mamba
         uses: mamba-org/setup-micromamba@v2
         with:
@@ -67,13 +99,8 @@ jobs:
         shell: bash -el {0}
         run: |
           python -m pip install .
-          
-      - name: Install pyjs-code-runner
-        shell: bash -el {0}
-        run: |
-          sudo playwright install-deps         
           playwright install
-  
+          
       - name: Run Tests
         shell: bash -el {0}
         run: |
