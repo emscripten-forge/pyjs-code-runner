@@ -16,15 +16,17 @@ if "GITHUB_ACTION" in os.environ:
 
 
 @pytest.fixture(scope="session")
-def env_prefix():
-    env_root = Path(appdirs.user_data_dir("pytest_code_runner_tests", "DerThorsten"))
-    env_root.mkdir(exist_ok=True, parents=True)
+def env_prefix(tmp_path_factory):
+    # env_root = Path(appdirs.user_data_dir("pytest_code_runner_tests", "DerThorsten"))
+    # env_root.mkdir(exist_ok=True, parents=True)
+    # env_prefix = Path(env_root) / "testenv"
+
+    env_root =  = tmp_path_factory.mktemp("pytest_code_runner_tests")
     env_prefix = Path(env_root) / "testenv"
 
     if env_prefix.exists():
         shutil.rmtree(env_prefix)
 
-    print("prefix", env_prefix)
     channels = (
         "-c https://repo.mamba.pm/emscripten-forge -c https://repo.mamba.pm/conda-forge"
     )
