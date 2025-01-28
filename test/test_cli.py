@@ -20,7 +20,7 @@ class TestCli(object):
     def test_sync_err(
         self, env_prefix, em_work_dir, backend_cli_settings, tmpdir, runner
     ):
-        print("sync_err", env_prefix, em_work_dir, backend_cli_settings, tmpdir)
+
         backend_type, backend_args = backend_cli_settings
 
         to_mount_dir = tmpdir

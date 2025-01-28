@@ -6,10 +6,6 @@ import shutil
 from typer.testing import CliRunner
 import os
 
-# @pytest.fixture(scope="session")
-# def session_temp_path(tmp_path_factory):
-#     return tmp_path_factory.mktemp()
-
 ON_GITHUB_ACTIONS = False
 if "GITHUB_ACTION" in os.environ:
     ON_GITHUB_ACTIONS = True
@@ -17,9 +13,6 @@ if "GITHUB_ACTION" in os.environ:
 
 @pytest.fixture(scope="session")
 def env_prefix(tmp_path_factory):
-    # env_root = Path(appdirs.user_data_dir("pytest_code_runner_tests", "DerThorsten"))
-    # env_root.mkdir(exist_ok=True, parents=True)
-    # env_prefix = Path(env_root) / "testenv"
 
     env_root = tmp_path_factory.mktemp("pytest_code_runner_tests")
     env_prefix = Path(env_root) / "testenv"
