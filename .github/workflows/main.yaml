@@ -22,7 +22,7 @@ jobs:
         uses: SimenB/github-actions-cpu-cores@v1
       
       - name: apt-install
-        run: sudo apt-get install -y  \
+        run: sudo apt-get update -y && sudo apt-get install -y  \
             libwoff1\ 
             libvpx9\
             libevent-2.1-7t64\
@@ -72,7 +72,7 @@ jobs:
         uses: SimenB/github-actions-cpu-cores@v1
 
       - name: apt-install
-        run: sudo apt-get install -y  \
+        run: sudo apt-get update -y && sudo apt-get install -y  \
             libwoff1\ 
             libvpx9\
             libevent-2.1-7t64\
