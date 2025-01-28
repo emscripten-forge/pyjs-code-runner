@@ -5,6 +5,7 @@ dependencies:
   - python
   - pip
   - pytest
+  - pytest-sugar
   - typer
   - platformdirs
   - empack >=3,<4

@@ -6,30 +6,25 @@ import shutil
 from typer.testing import CliRunner
 import os
 
-# @pytest.fixture(scope="session")
-# def session_temp_path(tmp_path_factory):
-#     return tmp_path_factory.mktemp()
-
 ON_GITHUB_ACTIONS = False
 if "GITHUB_ACTION" in os.environ:
     ON_GITHUB_ACTIONS = True
 
 
 @pytest.fixture(scope="session")
-def env_prefix():
-    env_root = Path(platformdirs.user_data_dir("pytest_code_runner_tests"))
-    env_root.mkdir(exist_ok=True, parents=True)
+def env_prefix(tmp_path_factory):
+
+    env_root = tmp_path_factory.mktemp("pytest_code_runner_tests")
     env_prefix = Path(env_root) / "testenv"
 
     if env_prefix.exists():
         shutil.rmtree(env_prefix)
 
-    print("prefix", env_prefix)
     channels = (
         "-c https://repo.mamba.pm/emscripten-forge -c https://repo.mamba.pm/conda-forge"
     )
     cmd = [
-        f"""$MAMBA_EXE create {channels} --yes --prefix {env_prefix} --platform=emscripten-32   python numpy pyjs """
+        f"""$MAMBA_EXE create {channels} --yes --prefix {env_prefix} --platform=emscripten-32   python numpy pyjs>=2.7.0"""
     ]
 
     ret = subprocess.run(cmd, shell=True)

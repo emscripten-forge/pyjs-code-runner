@@ -39,7 +39,13 @@ function eval_main_script(pyjs, workdir, filename) {
         return 0;
     }
     catch (e) {
-        console.error("error while evaluating main file:", e)
+        if (typeof e === "number") {
+            const msg = get_exception_message(e);
+            console.error("error while evaluating main file:", msg)
+        }
+        else {
+            console.error("error while evaluating main file:", e)
+        }
         return 1;
     }
     return 0
