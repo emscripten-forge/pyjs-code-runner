@@ -30,6 +30,7 @@ jobs:
             bash
 
       - name: Install playwright dependencies
+        shell: bash -el {0}
         run: sudo playwright install-deps         
           
       - name: Install Playwright
@@ -68,6 +69,7 @@ jobs:
           python -m pip install .
           
       - name: Install pyjs-code-runner
+        shell: bash -el {0}
         run: |
           sudo playwright install-deps         
           playwright install
