@@ -14,12 +14,12 @@ async function fetchMounts(pyjs) {
     let mounts = await response.json();
     pyjs.FS.mkdir("/mount_tarballs");
     await Promise.all(mounts.map(mount => fetchMount(pyjs, mount)));
-    
+
 }
 
 async function make_pyjs(print, error) {
     var pyjs = await createModule({ print: print, error: print })
-    
+
    await pyjs.bootstrap_from_empack_packed_environment(
         `./empack_env_meta.json`, /* packages_json_url */
         ".",               /* package_tarballs_root_url */
@@ -40,7 +40,7 @@ function eval_main_script(pyjs, workdir, filename) {
     }
     catch (e) {
         if (typeof e === "number") {
-            const msg = pyjs.get_exception_message(e);
+            const msg = pyjs.extract_exception_message(e);
             console.error("error while evaluating main file:", msg)
         }
         else {
