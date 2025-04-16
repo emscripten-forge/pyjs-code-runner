@@ -24,7 +24,7 @@ def env_prefix(tmp_path_factory):
         "-c https://repo.mamba.pm/emscripten-forge -c https://repo.mamba.pm/conda-forge"
     )
     cmd = [
-        f"""$MAMBA_EXE create {channels} --yes --prefix {env_prefix} --platform=emscripten-32   python numpy pyjs>=2.7.0"""
+        f"""$MAMBA_EXE create {channels} --yes --prefix {env_prefix} --platform=emscripten-32   python numpy pyjs>=2.7.1"""
     ]
 
     ret = subprocess.run(cmd, shell=True)
