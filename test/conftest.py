@@ -57,5 +57,5 @@ def em_work_dir():
 
 @pytest.fixture
 def runner():
-    runner = CliRunner(mix_stderr=True)
+    runner = CliRunner()
     return runner
