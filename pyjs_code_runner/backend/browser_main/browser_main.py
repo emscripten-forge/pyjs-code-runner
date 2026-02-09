@@ -75,7 +75,7 @@ class BrowserMainBackend(BackendBase):
                         collected_prints += "\\n";
                     }}
 
-                    var pyjs = await make_pyjs(print,print);
+                    var pyjs = await make_pyjs(print,print, true);
 
                     var r = globalThis.eval_main_script(pyjs, "{self.work_dir}","{self.script}");
                     if({int(self.async_main)}){{

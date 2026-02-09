@@ -10,7 +10,7 @@ import shutil
 
 class BrowserWorkerBackend(BackendBase):
     def __init__(
-        self, host_work_dir, work_dir, script, async_main, port, headless, slow_mo
+        self, host_work_dir, work_dir, script, async_main, port, headless, slow_mo, preload_shared_libs=True
     ):
         super().__init__(
             host_work_dir=host_work_dir,
@@ -23,6 +23,7 @@ class BrowserWorkerBackend(BackendBase):
         self.port = port
         self.headless = headless
         self.slow_mo = slow_mo
+        self.preload_shared_libs = preload_shared_libs
 
     def run(self):
         # copy html
@@ -73,7 +74,7 @@ class BrowserWorkerBackend(BackendBase):
                     }}
 
 
-                    var pyjs = await make_pyjs(print, print);
+                    var pyjs = await make_pyjs(print, print, {str(self.preload_shared_libs).lower()});
 
                     var r = eval_main_script(pyjs, "{self.work_dir}","{self.script}");
                     if({int(self.async_main)}){{

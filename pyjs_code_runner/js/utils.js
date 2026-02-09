@@ -17,13 +17,14 @@ async function fetchMounts(pyjs) {
 
 }
 
-async function make_pyjs(print, error) {
+async function make_pyjs(print, error, preload_load_shared_libs=true) {
     var pyjs = await createModule({ print: print, error: print })
 
    await pyjs.bootstrap_from_empack_packed_environment(
         `./empack_env_meta.json`, /* packages_json_url */
         ".",               /* package_tarballs_root_url */
-        false              /* verbose */
+        false,              /* verbose */
+        !preload_load_shared_libs  /* skip_loading_shared_libs */
     );
     globalThis.pyjs = pyjs
     return pyjs
