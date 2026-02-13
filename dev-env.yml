@@ -7,7 +7,7 @@ dependencies:
   - pytest
   - pytest-sugar
   - typer
-  - appdirs
+  - platformdirs
   - empack >=3,<4
   - microsoft::playwright
   - emsdk
