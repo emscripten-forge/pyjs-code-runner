@@ -1,16 +1,38 @@
 import os
 import asyncio
 from ..backend_base import BackendBase
+from ..backend import BrowserType, launch_browser
 from ...constants import JS_DIR, HTML_DIR
 from ..browser_main.server import server_context, find_free_port
 from playwright.async_api import async_playwright
+from playwright.async_api import Error as PlaywrightError
 from pathlib import Path
 import shutil
 
 
+def _is_target_closed_error(e):
+    # TargetClosedError is not part of playwright's public api (and older
+    # versions raise a plain Error with a "Target closed" message)
+    msg = str(e)
+    return (
+        type(e).__name__ == "TargetClosedError"
+        or "Target closed" in msg
+        or "has been closed" in msg
+    )
+
+
 class BrowserWorkerBackend(BackendBase):
     def __init__(
-        self, host_work_dir, work_dir, script, async_main, port, headless, slow_mo, preload_shared_libs=True
+        self,
+        host_work_dir,
+        work_dir,
+        script,
+        async_main,
+        port,
+        headless,
+        slow_mo,
+        preload_shared_libs=True,
+        browser=BrowserType.chromium,
     ):
         super().__init__(
             host_work_dir=host_work_dir,
@@ -23,6 +45,7 @@ class BrowserWorkerBackend(BackendBase):
         self.port = port
         self.headless = headless
         self.slow_mo = slow_mo
+        self.browser = BrowserType(browser)
         self.preload_shared_libs = preload_shared_libs
 
     def run(self):
@@ -47,12 +70,9 @@ class BrowserWorkerBackend(BackendBase):
 
     async def playwright_run_in_worker_thread(self, page_url):
         async with async_playwright() as p:
-            if self.slow_mo is None:
-                browser = await p.chromium.launch(headless=self.headless)
-            else:
-                browser = await p.chromium.launch(
-                    headless=self.headless, slow_mo=self.slow_mo
-                )
+            browser = await launch_browser(
+                p, self.browser, headless=self.headless, slow_mo=self.slow_mo
+            )
             page = await browser.new_page()
 
             # n min = n_min * 60 * 1000 ms
@@ -60,37 +80,16 @@ class BrowserWorkerBackend(BackendBase):
             page.set_default_timeout(n_min * 60 * 1000)
 
             async def handle_worker(worker):
-                test_output = await worker.evaluate_handle(
-                    f"""async () =>
-                {{
-
-                    {self.js_utils()}
-
-                    var collected_prints = ""
-                    const print = (text) => {{
-                        console.log(text)
-                        collected_prints += text;
-                        collected_prints += "\\n";
-                    }}
-
-
-                    var pyjs = await make_pyjs(print, print, {str(self.preload_shared_libs).lower()});
-
-                    var r = eval_main_script(pyjs, "{self.work_dir}","{self.script}");
-                    if({int(self.async_main)}){{
-                        r = r || await run_async_python_main(pyjs);
-                    }}
-
-                    msg = {{
-                        return_code : r,
-                        collected_prints : collected_prints
-                    }}
-                    self.postMessage(msg)
-                    return r
-                }}"""
-                )
-                if int(str(test_output)) != 0:
-                    raise RuntimeError(f"tests failed with return code: {test_output}")
+                try:
+                    await self._run_in_worker(worker)
+                except PlaywrightError as e:
+                    if not _is_target_closed_error(e):
+                        raise
+                    # the page terminates the worker as soon as the worker has
+                    # posted its result (see browser_worker.html), which may
+                    # happen before playwright receives the evaluate result.
+                    # The return code is read from the page below.
+                    pass
 
             page.on("worker", handle_worker)
 
@@ -117,3 +116,36 @@ class BrowserWorkerBackend(BackendBase):
             )
             return_code = int(str(await test_output.get_property("return_code")))
         return return_code
+
+    async def _run_in_worker(self, worker):
+        test_output = await worker.evaluate_handle(
+            f"""async () =>
+        {{
+
+            {self.js_utils()}
+
+            var collected_prints = ""
+            const print = (text) => {{
+                console.log(text)
+                collected_prints += text;
+                collected_prints += "\\n";
+            }}
+
+
+            var pyjs = await make_pyjs(print, print, {str(self.preload_shared_libs).lower()});
+
+            var r = eval_main_script(pyjs, "{self.work_dir}","{self.script}");
+            if({int(self.async_main)}){{
+                r = r || await run_async_python_main(pyjs);
+            }}
+
+            msg = {{
+                return_code : r,
+                collected_prints : collected_prints
+            }}
+            self.postMessage(msg)
+            return r
+        }}"""
+        )
+        if int(str(test_output)) != 0:
+            raise RuntimeError(f"tests failed with return code: {test_output}")

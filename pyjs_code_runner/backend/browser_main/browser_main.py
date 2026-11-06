@@ -1,6 +1,7 @@
 import os
 import asyncio
 from ..backend_base import BackendBase
+from ..backend import BrowserType, launch_browser
 from ...constants import JS_DIR, HTML_DIR
 from .server import server_context, find_free_port
 from playwright.async_api import async_playwright
@@ -13,7 +14,15 @@ THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 
 class BrowserMainBackend(BackendBase):
     def __init__(
-        self, host_work_dir, work_dir, script, async_main, port, headless, slow_mo
+        self,
+        host_work_dir,
+        work_dir,
+        script,
+        async_main,
+        port,
+        headless,
+        slow_mo,
+        browser=BrowserType.chromium,
     ):
         super().__init__(
             host_work_dir=host_work_dir,
@@ -26,6 +35,7 @@ class BrowserMainBackend(BackendBase):
         self.port = port
         self.headless = headless
         self.slow_mo = slow_mo
+        self.browser = BrowserType(browser)
 
     def run(self):
         browser_main_html = "browser_main.html"
@@ -43,12 +53,9 @@ class BrowserMainBackend(BackendBase):
 
     async def playwright_run_in_main_thread(self, page_url):
         async with async_playwright() as p:
-            if self.slow_mo is None:
-                browser = await p.chromium.launch(headless=self.headless)
-            else:
-                browser = await p.chromium.launch(
-                    headless=self.headless, slow_mo=self.slow_mo
-                )
+            browser = await launch_browser(
+                p, self.browser, headless=self.headless, slow_mo=self.slow_mo
+            )
             page = await browser.new_page()
             await page.goto(page_url)
             # n min = n_min * 60 * 1000 ms

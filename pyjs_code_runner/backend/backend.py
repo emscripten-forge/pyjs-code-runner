@@ -13,6 +13,35 @@ class BackendType(str, Enum):
     node = "node"
 
 
+class BrowserType(str, Enum):
+    """Browser engines available via playwright.
+
+    `webkit` is playwright's build of WebKit, the engine behind Safari.
+    """
+
+    chromium = "chromium"
+    firefox = "firefox"
+    webkit = "webkit"
+
+
+async def launch_browser(playwright, browser, headless, slow_mo=None):
+    """Launch `browser` (a BrowserType or its name) with playwright."""
+    browser = BrowserType(browser)
+    launcher = getattr(playwright, browser.value)
+    kwargs = dict(headless=headless)
+    if slow_mo is not None:
+        kwargs["slow_mo"] = slow_mo
+    try:
+        return await launcher.launch(**kwargs)
+    except Exception as e:
+        if "Executable doesn't exist" in str(e):
+            raise RuntimeError(
+                f"playwright browser `{browser.value}` is not installed, "
+                f"install it with:\n\n    playwright install {browser.value}\n"
+            ) from e
+        raise
+
+
 def get_backend_type_family(backend):
     if backend == BackendType.node:
         return BackendFamilyType.node

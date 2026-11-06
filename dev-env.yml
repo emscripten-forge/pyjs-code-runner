@@ -9,6 +9,7 @@ dependencies:
   - typer
   - appdirs
   - empack >=3,<4
-  - microsoft::playwright
+  - playwright
+  - playwright-python
   - emsdk
   - rich

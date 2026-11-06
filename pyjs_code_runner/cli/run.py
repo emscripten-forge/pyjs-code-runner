@@ -8,7 +8,7 @@ from .err import exit_with_err
 
 from .utils import require_option, make_names
 from ..run import run
-from ..backend.backend import BackendType
+from ..backend.backend import BackendType, BrowserType
 from ..get_cache_dir import get_cache_dir
 from ..get_file_filter import get_file_filter
 from ..constants import EMSCRIPTEN_HOME
@@ -113,6 +113,12 @@ slowmo_option = typer.Option(
     help="""run browser in slow-mo (only when not in headless mode)""",
 )
 
+browser_option = typer.Option(
+    BrowserType.chromium,
+    "--browser",
+    help="""browser engine to run in (webkit is the engine behind Safari)""",
+)
+
 
 @script_app.command()
 def browser_main(
@@ -130,6 +136,7 @@ def browser_main(
     port: Optional[int] = port_option,
     headless: bool = headless_option,
     slow_mo: Optional[int] = slowmo_option,
+    browser: BrowserType = browser_option,
 ):
     run_script(
         backend_type=BackendType.browser_main,
@@ -144,7 +151,9 @@ def browser_main(
         cache_dir=cache_dir,
         use_cache=cache,
         host_work_dir=host_work_dir,
-        backend_kwargs=dict(port=port, headless=headless, slow_mo=slow_mo),
+        backend_kwargs=dict(
+            port=port, headless=headless, slow_mo=slow_mo, browser=browser
+        ),
     )
 
 
@@ -164,6 +173,7 @@ def browser_worker(
     port: Optional[int] = port_option,
     headless: bool = headless_option,
     slow_mo: Optional[int] = slowmo_option,
+    browser: BrowserType = browser_option,
 ):
     run_script(
         backend_type=BackendType.browser_worker,
@@ -178,7 +188,9 @@ def browser_worker(
         cache_dir=cache_dir,
         use_cache=cache,
         host_work_dir=host_work_dir,
-        backend_kwargs=dict(port=port, headless=headless, slow_mo=slow_mo),
+        backend_kwargs=dict(
+            port=port, headless=headless, slow_mo=slow_mo, browser=browser
+        ),
     )
 
 
