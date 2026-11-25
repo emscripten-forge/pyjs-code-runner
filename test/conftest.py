@@ -1,7 +1,7 @@
 import pytest
 import subprocess
 from pathlib import Path
-import appdirs
+import platformdirs
 import shutil
 from typer.testing import CliRunner
 import os
