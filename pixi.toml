@@ -1,0 +1,50 @@
+# Development environment + tasks:
+#
+#   pixi run test                      # npm mode, chromium (what the CI runs)
+#   pixi run test "chromium firefox"   # browsers (chromium, firefox, webkit)
+#   pixi run test-conda                # conda mode (local)
+#
+# npm mode: pyjs from the published npm package (PYJS_CODE_RUNNER_TEST_NPM,
+# default @derthorsten/pyjs@6.0.1, see test/conftest.py).
+# conda mode: the tests create an emscripten-forge env (python, numpy,
+# pyjs-dev >= 6) with micromamba; a local recipe build (e.g. a new pyjs) is
+# searched first with PYJS_CODE_RUNNER_TEST_CHANNEL=<rattler-build output dir>.
+[workspace]
+name = "pyjs-code-runner"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64", "osx-64"]
+
+[dependencies]
+python = ">=3.10"
+empack = "*"
+# the node driver and the python API must have the same minor version
+# ("timeout: expected float, got undefined" otherwise)
+playwright = "1.65.*"
+playwright-python = "1.65.*"
+typer = "*"
+rich = "*"
+pytest = "*"
+# (creates the emscripten env the tests run in)
+micromamba = "*"
+
+[pypi-dependencies]
+pyjs-code-runner = { path = ".", editable = true }
+
+[tasks.install-browsers]
+description = "install the playwright browsers (the CI also installs their system libraries: --with-deps)"
+args = [{ arg = "browsers", default = "chromium" }]
+cmd = "playwright install {{ browsers }}"
+
+[tasks.test]
+description = "the tests, pyjs from the npm package, in the given browsers (chromium, firefox, webkit)"
+args = [{ arg = "browsers", default = "chromium" }]
+depends-on = [{ task = "install-browsers", args = ["{{ browsers }}"] }]
+cmd = "pytest -s -v test"
+env = { PYJS_CODE_RUNNER_TEST_BROWSERS = "{{ browsers }}", PYJS_CODE_RUNNER_TEST_MODE = "npm" }
+
+[tasks.test-conda]
+description = "the tests, pyjs from an emscripten-forge env (pyjs-dev >= 6), in the given browsers"
+args = [{ arg = "browsers", default = "chromium" }]
+depends-on = [{ task = "install-browsers", args = ["{{ browsers }}"] }]
+cmd = "pytest -s -v test"
+env = { PYJS_CODE_RUNNER_TEST_BROWSERS = "{{ browsers }}", PYJS_CODE_RUNNER_TEST_MODE = "conda" }

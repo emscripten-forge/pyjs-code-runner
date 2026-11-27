@@ -44,9 +44,27 @@ def parse_mounts(mounts):
     return parsed_mounts
 
 
-conda_env_option = require_option(
+conda_env_option = typer.Option(
+    None,
     *make_names("conda-env"),
-    help="host location of the conda environment in which to run the code",
+    help="host location of the conda environment (with pyjs >= 6) in which to run the code; "
+    "required unless --pyjs-npm is given",
+)
+pyjs_npm_option = typer.Option(
+    None,
+    "--pyjs-npm",
+    help="run with a pyjs npm package instead of a conda env: <name>@<version> from the npm "
+    "registry, or a local package directory / .tgz",
+)
+packages_option = typer.Option(
+    None,
+    "--package",
+    help="(with --pyjs-npm) conda package spec to install at runtime, repeatable",
+)
+arch_option = typer.Option(
+    "wasm32",
+    "--arch",
+    help="(with --pyjs-npm) wasm32 or wasm64",
 )
 script_option = require_option(
     *make_names("script"), help="path of script inside the virtual fileystem to run"
@@ -122,7 +140,7 @@ browser_option = typer.Option(
 
 @script_app.command()
 def browser_main(
-    conda_env: Path = conda_env_option,
+    conda_env: Optional[Path] = conda_env_option,
     script: Path = script_option,
     async_main: bool = async_main_option,
     mounts: List[str] = mounts_option,
@@ -137,6 +155,9 @@ def browser_main(
     headless: bool = headless_option,
     slow_mo: Optional[int] = slowmo_option,
     browser: BrowserType = browser_option,
+    pyjs_npm: Optional[str] = pyjs_npm_option,
+    packages: Optional[List[str]] = packages_option,
+    arch: str = arch_option,
 ):
     run_script(
         backend_type=BackendType.browser_main,
@@ -151,15 +172,16 @@ def browser_main(
         cache_dir=cache_dir,
         use_cache=cache,
         host_work_dir=host_work_dir,
-        backend_kwargs=dict(
-            port=port, headless=headless, slow_mo=slow_mo, browser=browser
-        ),
+        backend_kwargs=dict(port=port, headless=headless, slow_mo=slow_mo, browser=browser),
+        pyjs_npm=pyjs_npm,
+        packages=packages,
+        arch=arch,
     )
 
 
 @script_app.command()
 def browser_worker(
-    conda_env: Path = conda_env_option,
+    conda_env: Optional[Path] = conda_env_option,
     script: Path = script_option,
     async_main: bool = async_main_option,
     mounts: List[str] = mounts_option,
@@ -174,6 +196,9 @@ def browser_worker(
     headless: bool = headless_option,
     slow_mo: Optional[int] = slowmo_option,
     browser: BrowserType = browser_option,
+    pyjs_npm: Optional[str] = pyjs_npm_option,
+    packages: Optional[List[str]] = packages_option,
+    arch: str = arch_option,
 ):
     run_script(
         backend_type=BackendType.browser_worker,
@@ -188,9 +213,10 @@ def browser_worker(
         cache_dir=cache_dir,
         use_cache=cache,
         host_work_dir=host_work_dir,
-        backend_kwargs=dict(
-            port=port, headless=headless, slow_mo=slow_mo, browser=browser
-        ),
+        backend_kwargs=dict(port=port, headless=headless, slow_mo=slow_mo, browser=browser),
+        pyjs_npm=pyjs_npm,
+        packages=packages,
+        arch=arch,
     )
 
 
@@ -247,9 +273,14 @@ def run_script(
     cache_dir,
     use_cache,
     backend_kwargs=None,
+    pyjs_npm=None,
+    packages=None,
+    arch="wasm32",
 ):
     if backend_kwargs is None:
         backend_kwargs = dict()
+    if conda_env is None and pyjs_npm is None:
+        exit_with_err("either --conda-env or --pyjs-npm is required")
     mounts = parse_mounts(mounts)
     if use_cache:
         cache_dir = get_cache_dir(cache_dir=cache_dir)
@@ -271,4 +302,7 @@ def run_script(
         use_cache=use_cache,
         host_work_dir=host_work_dir,
         backend_kwargs=backend_kwargs,
+        pyjs_npm=pyjs_npm,
+        packages=packages,
+        arch=arch,
     )

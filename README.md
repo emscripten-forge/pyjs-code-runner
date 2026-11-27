@@ -4,43 +4,51 @@
 
 A driver to run python code in a wasm environment, almost like running vanilla python code.
 
-## Motivation
+## How it works
 
-Debugging, experimenting and testing python code from a dedicated conda environment
-in browser environment is a complex process with a lot of (complicated) steps.
+The script runs in a browser (playwright, main thread or web worker), driven by
+the JavaScript of the pyjs npm package. Where pyjs and python come from:
 
-* create the environment for emscripten
-* pack the environemtn
+* **a conda env** (`--conda-env`): an emscripten-forge env with **pyjs >= 6**.
+  Its runtime and the npm JavaScript (`lib_js/pyjs/npm`, shipped by the pyjs
+  conda package) are used, and the env is packed with empack. So exactly what
+  is installed there runs, e.g. a python, pyjs and a package that were just
+  built locally. This is what `pytester` (emscripten-forge recipe tests) uses.
+* **an npm package** (`--pyjs-npm @scope/pyjs@6.0.0`, or a local package
+  directory / `.tgz`): its own runtime and environment; extra conda packages
+  with `--package <spec>` (repeatable) are installed at runtime.
+
+Directories are mounted with `--mount <host dir>:<path in the browser>`.
+pyjs < 6 envs are not supported anymore (use pyjs-code-runner 3.x).
 
 ## Installation
 
-Currently `pyjs-code-runner` is not available on PyPI. To install it, clone the repository and install it with `pip`:
-
-We first recommend to create a new conda environment for `pyjs-code-runner`:
+`pyjs_code_runner` is on conda-forge:
 
 ```bash
-mamba create -n pyjs-code-runner -c conda-forge python
-mamba activate pyjs-code-runner
+mamba install -c conda-forge pyjs_code_runner
+playwright install chromium
 ```
 
-Then install `pyjs-code-runner`:
+You will then need an emscripten-forge environment for the code you want to run in the browser:
 
 ```bash
-git clone https://github.com/emscripten-forge/pyjs-code-runner
-cd pyjs-code-runner
-python -m pip install -e .
+micromamba create -n my_env --platform=emscripten-wasm32 \
+    -c https://repo.prefix.dev/emscripten-forge/6x -c conda-forge \
+    python numpy "pyjs-dev>=6"
 ```
 
-Then install the browser for use with Playwright:
+## Development
+
+With [pixi](https://pixi.sh):
 
 ```bash
-playwright install
-```
-
-You will then need another conda environment for the code you want to run in the browser. Here we specify the `emscripten-forge` channel and the `emscripten-32` platform:
-
-```bash
-mamba create -n my_env -c https://repo.mamba.pm/emscripten-forge -c https://repo.mamba.pm/conda-forge --platform=emscripten-32 python numpy pyjs
+# npm mode: pyjs from the published npm package (what the CI runs)
+pixi run test                        # chromium
+pixi run test "chromium firefox webkit"
+# conda mode: an emscripten-forge env with pyjs-dev >= 6 (local); a local
+# recipe build (e.g. a new pyjs) is searched first:
+PYJS_CODE_RUNNER_TEST_CHANNEL=/path/to/recipes/output pixi run test-conda
 ```
 
 You might want to add more dependencies to this environment, depending on the code you would like to run.

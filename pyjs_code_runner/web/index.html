@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>pyjs-code-runner</title>
+  </head>
+  <body>
+    <script type="module">
+      // `?worker`: run in a web worker (worker.js), else in this page. The
+      // driver (backend/browser.py) waits for `globalThis.result`:
+      // {code} or {error}. Output reaches it via console.log / console.error.
+      const inWorker = new URLSearchParams(location.search).has("worker");
+      // (the first result counts)
+      const done = (result) => (globalThis.result ??= result);
+      // An error outside the awaited run (a trap in a timer / event callback
+      // of the asyncio loop, ...) ends the run too, instead of waiting for a
+      // result that never comes.
+      const describe = (error) => String(error && error.stack ? error.stack : error);
+      addEventListener("error", (event) => done({ error: `uncaught: ${describe(event.error ?? event.message)}` }));
+      addEventListener("unhandledrejection", (event) => done({ error: `unhandled rejection: ${describe(event.reason)}` }));
+      if (inWorker) {
+        const worker = new Worker("./worker.js", { type: "module" });
+        worker.onmessage = ({ data }) => {
+          if (data.print !== undefined) console.log(data.print);
+          else if (data.printErr !== undefined) console.error(data.printErr);
+          else done(data);
+        };
+        worker.onerror = (event) => done({ error: `error in the worker: ${event.message}` });
+      } else {
+        const { run } = await import("./run.js");
+        run(console.log, console.error).then(
+          (code) => done({ code }),
+          (error) => done({ error: String(error && error.stack ? error.stack : error) })
+        );
+      }
+    </script>
+  </body>
+</html>

@@ -1,7 +1,6 @@
 import pytest
 import subprocess
 from pathlib import Path
-import appdirs
 import shutil
 from typer.testing import CliRunner
 import os
@@ -9,6 +8,25 @@ import os
 ON_GITHUB_ACTIONS = False
 if "GITHUB_ACTION" in os.environ:
     ON_GITHUB_ACTIONS = True
+
+
+# Where pyjs comes from in the tests:
+#   npm   (default, the CI): the published npm package PYJS_CODE_RUNNER_TEST_NPM
+#   conda (local, `pixi run test-conda`): an emscripten-forge env with
+#         pyjs-dev >= 6, e.g. from a local recipe build
+#         (PYJS_CODE_RUNNER_TEST_CHANNEL)
+TEST_MODE = os.environ.get("PYJS_CODE_RUNNER_TEST_MODE", "npm")
+TEST_NPM = os.environ.get("PYJS_CODE_RUNNER_TEST_NPM", "@derthorsten/pyjs@6.0.1")
+
+
+@pytest.fixture(scope="session")
+def pyjs_args(request):
+    """the CLI arguments that say where pyjs comes from (see TEST_MODE)"""
+    if TEST_MODE == "npm":
+        return ["--pyjs-npm", TEST_NPM]
+    if TEST_MODE == "conda":
+        return ["--conda-env", request.getfixturevalue("env_prefix")]
+    raise ValueError(f"PYJS_CODE_RUNNER_TEST_MODE: npm or conda, not {TEST_MODE!r}")
 
 
 @pytest.fixture(scope="session")
@@ -21,8 +39,15 @@ def env_prefix(tmp_path_factory):
         shutil.rmtree(env_prefix)
 
     channels = "-c https://repo.prefix.dev/emscripten-forge/6x -c conda-forge"
+    # e.g. a local recipe build output with a freshly built pyjs, searched first
+    local_channel = os.environ.get("PYJS_CODE_RUNNER_TEST_CHANNEL")
+    if local_channel:
+        channels = f"-c {local_channel} {channels}"
+    # (pyjs >= 6: its conda package ships the npm JavaScript the runner needs)
+    # micromamba of the pixi env (or the one of setup-micromamba)
+    mamba = os.environ.get("MAMBA_EXE", "micromamba")
     cmd = [
-        f"""$MAMBA_EXE create {channels} --yes --prefix {env_prefix} --platform=emscripten-wasm32 python numpy "pyjs-dev>=4.1.0" """
+        f"""{mamba} create {channels} --yes --prefix {env_prefix} --platform=emscripten-wasm32 python numpy "pyjs-dev>=6" """
     ]
 
     ret = subprocess.run(cmd, shell=True)

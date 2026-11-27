@@ -18,7 +18,7 @@ class TestCli(object):
         assert "Usage:" in result.stdout
 
     def test_sync_err(
-        self, env_prefix, em_work_dir, backend_cli_settings, tmpdir, runner
+        self, pyjs_args, em_work_dir, backend_cli_settings, tmpdir, runner
     ):
 
         backend_type, backend_args = backend_cli_settings
@@ -33,7 +33,7 @@ class TestCli(object):
             "run",
             "script",
             backend_type,
-            "--conda-env",  env_prefix,
+            *pyjs_args,
             "--mount",      cli_mount,
             "--script",     "main.py",
             "--work-dir",   em_work_dir,
@@ -46,7 +46,7 @@ class TestCli(object):
 
     def test_async_error(
         self,
-        env_prefix,
+        pyjs_args,
         em_work_dir,
         backend_cli_settings,
         tmpdir,
@@ -71,7 +71,7 @@ class TestCli(object):
             "run",
             "script",
             backend_type,
-            "--conda-env",  env_prefix,
+            *pyjs_args,
             "--mount",      cli_mount,
             "--script",     "main.py",
             "--work-dir",   em_work_dir,
@@ -83,7 +83,7 @@ class TestCli(object):
         assert result.exit_code == 1
 
     def test_sync_hello_world(
-        self, env_prefix, em_work_dir, backend_cli_settings, tmpdir, runner
+        self, pyjs_args, em_work_dir, backend_cli_settings, tmpdir, runner
     ):
         to_mount_dir = tmpdir
         cli_mount = f"{str(tmpdir)}:{str(em_work_dir)}"
@@ -96,7 +96,7 @@ class TestCli(object):
             "run",
             "script",
             backend_type,
-            "--conda-env",  env_prefix,
+            *pyjs_args,
             "--mount",      cli_mount,
             "--script",     "main.py",
             "--work-dir",   em_work_dir,
@@ -111,7 +111,7 @@ class TestCli(object):
     @pytest.mark.parametrize("with_return", [False, True])
     def test_async_hello_world(
         self,
-        env_prefix,
+        pyjs_args,
         em_work_dir,
         backend_cli_settings,
         with_return,
@@ -144,7 +144,7 @@ class TestCli(object):
             "run",
             "script",
             backend_type,
-            "--conda-env",  env_prefix,
+            *pyjs_args,
             "--mount",      cli_mount,
             "--script",     "main.py",
             "--work-dir",   em_work_dir,

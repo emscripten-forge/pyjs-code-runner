@@ -90,17 +90,10 @@ def ensure_playwright_imports():
 
 def get_backend_cls(backend_type):
     if backend_type == BackendType.node:
-        raise RuntimeError(
-            "the node backend is currently disabled as its not (yet) working with empack>=3.0.0"
-        )
+        raise RuntimeError("the node backend is not supported: use browser-main or browser-worker")
+    ensure_playwright_imports()
+    from .browser import BrowserMainBackend, BrowserWorkerBackend
 
-    elif backend_type == BackendType.browser_main:
-        ensure_playwright_imports()
-        from .browser_main.browser_main import BrowserMainBackend
-
+    if backend_type == BackendType.browser_main:
         return BrowserMainBackend
-    elif backend_type == BackendType.browser_worker:
-        ensure_playwright_imports()
-        from .browser_worker.browser_worker import BrowserWorkerBackend
-
-        return BrowserWorkerBackend
+    return BrowserWorkerBackend
